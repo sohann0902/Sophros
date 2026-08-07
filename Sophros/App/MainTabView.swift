@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import CoreData
 
 struct MainTabView: View {
     var body: some View {
@@ -39,4 +40,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

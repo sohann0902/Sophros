@@ -15,7 +15,7 @@ struct Colormanager {
     static let border: Color = Color("border")
 
     struct Accent {
-        static let primary: Color = Color("primary")
+        static let primary: Color = Color("primaryAccent")
         static let button: Color = Color("button")
         static let progressBar: Color = Color("progressBar")
         static let selected: Color = Color("selected")
