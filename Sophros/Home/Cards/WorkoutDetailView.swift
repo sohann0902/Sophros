@@ -1,5 +1,5 @@
 //
-//  WorkoutCard.swift
+//  WorkoutDetailView.swift
 //  Sophros
 //
 //  Created by Sohan Maurya on 04/08/26.
@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-struct WorkoutCard: View {
+struct WorkoutDetailView: View {
+    let card : DashboardCard
     var body: some View {
         Text("Workout")
     }

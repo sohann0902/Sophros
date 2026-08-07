@@ -11,32 +11,34 @@ struct HomeView : View {
     
     
     var body: some View {
-        GeometryReader { geometry in
-            
-            ZStack(alignment: .topLeading) {
-                Colormanager.baseBackground
-                    .ignoresSafeArea()
+        NavigationStack {
+            GeometryReader { geometry in
                 
-                //titleView
-                VStack(alignment: .leading) {
+                ZStack(alignment: .topLeading) {
+                    Colormanager.baseBackground
+                        .ignoresSafeArea()
                     
-                    HStack(alignment: .top) {
-                        Text("Welcome back,\nSohan")
-                            .font(.system(size: 32, weight: .heavy))
+                    //titleView
+                    VStack(alignment: .leading) {
                         
-                        Spacer()
+                        HStack(alignment: .top) {
+                            Text("Welcome back,\nSohan")
+                                .font(.system(size: 32, weight: .heavy))
+                            
+                            Spacer()
+                            
+                            StreakView(streakCount: 1)
+                        }
+                        .foregroundStyle(Colormanager.Typography.primaryText)
+                        .padding()
                         
-                        StreakView(streakCount: 1)
+                        // dashboard
+                        CardsView()
+                        
                     }
-                    .foregroundStyle(Colormanager.Typography.primaryText)
-                    .padding()
-                    
-                    // dashboard
-                    CardsView()
-                    
                 }
+                
             }
-            
         }
     }
 }

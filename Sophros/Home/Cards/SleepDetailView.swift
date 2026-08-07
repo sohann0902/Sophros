@@ -1,5 +1,5 @@
 //
-//  CycleCard.swift
+//  SleepDetailView.swift
 //  Sophros
 //
 //  Created by Sohan Maurya on 04/08/26.
@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct CycleCard: View {
+struct SleepDetailView: View {
+    let card : DashboardCard
     var body: some View {
-        Text("CycleCard")
+        Text("SleepCard")
     }
 }
