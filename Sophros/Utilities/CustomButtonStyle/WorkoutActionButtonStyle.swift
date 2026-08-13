@@ -1,0 +1,30 @@
+//
+//  WorkoutActionButtonStyle.swift
+//  Sophros
+//
+//  Created by Sohan Maurya on 11/08/26.
+//
+
+import SwiftUI
+
+struct WorkoutActionButtonStyle: ButtonStyle {
+    let isPrimary: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(
+                isPrimary ? .white : Colormanager.Workout.terracotta
+            )
+            .padding(.vertical, 14)
+            .background(
+                isPrimary
+                    ? Colormanager.Workout.terracotta
+                    : Colormanager.card
+            )
+            .clipShape(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
+            .opacity(configuration.isPressed ? 0.75 : 1)
+    }
+}

@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		B500022B3025C8D600E2C24E /* UserProfile+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50002293025C8D600E2C24E /* UserProfile+CoreDataClass.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		B500FF443021D83A00E2C24E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -28,7 +24,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		B50002293025C8D600E2C24E /* UserProfile+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserProfile+CoreDataClass.swift"; sourceTree = "<group>"; };
 		B500FF313021D83800E2C24E /* Sophros.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sophros.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B500FF433021D83A00E2C24E /* SophrosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SophrosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B500FF4D3021D83A00E2C24E /* SophrosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SophrosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,7 +75,6 @@
 		B500FF283021D83800E2C24E = {
 			isa = PBXGroup;
 			children = (
-				B50002293025C8D600E2C24E /* UserProfile+CoreDataClass.swift */,
 				B500FF333021D83800E2C24E /* Sophros */,
 				B500FF463021D83A00E2C24E /* SophrosTests */,
 				B500FF503021D83A00E2C24E /* SophrosUITests */,
@@ -242,7 +236,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B500022B3025C8D600E2C24E /* UserProfile+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

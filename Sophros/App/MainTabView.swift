@@ -34,6 +34,7 @@ struct MainTabView: View {
         }
         .tint(Colormanager.Accent.selected)
         .toolbarBackgroundVisibility(.hidden, for: .tabBar)
+        .preferredColorScheme(.light)
     }
 }
 
