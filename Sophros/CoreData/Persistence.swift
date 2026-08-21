@@ -36,6 +36,29 @@ struct PersistenceController {
         goal.id = UUID()
         goal.createdAt = .now
         goal.updatedAt = .now
+
+        let reminder1 = Reminder(context: viewContext)
+        reminder1.id = UUID()
+        reminder1.title = "Drink 2.5L Water"
+        reminder1.dueAt = Calendar.current.date(byAdding: .hour, value: 2, to: .now)
+        reminder1.sortOrder = 0
+        reminder1.createdAt = .now
+        reminder1.updatedAt = .now
+
+        let reminder2 = Reminder(context: viewContext)
+        reminder2.id = UUID()
+        reminder2.title = "Read 20 pages"
+        reminder2.sortOrder = 1
+        reminder2.createdAt = .now
+        reminder2.updatedAt = .now
+
+        let reminder3 = Reminder(context: viewContext)
+        reminder3.id = UUID()
+        reminder3.title = "Buy groceries"
+        reminder3.completedAt = .now
+        reminder3.sortOrder = 0
+        reminder3.createdAt = .now
+        reminder3.updatedAt = .now
         
         let calendar = Calendar.current
         let weekStart = calendar.dateInterval(of: .weekOfYear, for: .now)!.start
