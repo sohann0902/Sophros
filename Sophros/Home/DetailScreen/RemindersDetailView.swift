@@ -2,7 +2,7 @@
 //  RemindersDetailView.swift
 //  Sophros
 //
-//  Created by Sohan Maurya on 04/08/26.
+//  Created by Sohan Maurya on 21/08/26.
 //
 
 import SwiftUI
