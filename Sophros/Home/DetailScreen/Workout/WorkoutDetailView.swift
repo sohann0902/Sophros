@@ -115,7 +115,7 @@ struct WorkoutDetailView: View {
         print("----------------------------\n")
     }
     
-    @State private var showingWeekCalendar = false
+    @State private var showingCalendar = false
 
     var body: some View {
         ZStack {
@@ -137,23 +137,23 @@ struct WorkoutDetailView: View {
             }
             .background(Colormanager.baseBackground.ignoresSafeArea())
 
-            if showingWeekCalendar {
+            if showingCalendar {
                 Color.black.opacity(0.25)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        showingWeekCalendar = false
+                        showingCalendar = false
                     }
 
-                WeekCalendarOverlay(
+                CalendarOverlay(
                     selectedWeek: $selectedWeek,
-                    isPresented: $showingWeekCalendar,
+                    isPresented: $showingCalendar,
                     calendar: calendar
                 )
                 .padding(20)
                 .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: showingWeekCalendar)
+        .animation(.easeInOut(duration: 0.2), value: showingCalendar)
         .navigationTitle("Workout")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingCreateWorkout) {
@@ -170,7 +170,7 @@ struct WorkoutDetailView: View {
         HStack(spacing: 16) {
             Spacer()
             Button {
-                showingWeekCalendar = true
+                showingCalendar = true
             } label: {
                 HStack {
                     Text(
@@ -390,7 +390,7 @@ private struct WorkoutSummaryMetric: View {
     }
 }
 
-private struct WeekCalendarOverlay: View {
+struct CalendarOverlay: View {
     @Binding var selectedWeek: Date
     @Binding var isPresented: Bool
 
@@ -454,6 +454,6 @@ private struct WeekCalendarOverlay: View {
 }
 
 #Preview {
-    WeekCalendarOverlay(selectedWeek: .constant(.now), isPresented: .constant(.init(true)), calendar: .current)
+    CalendarOverlay(selectedWeek: .constant(.now), isPresented: .constant(.init(true)), calendar: .current)
 }
 

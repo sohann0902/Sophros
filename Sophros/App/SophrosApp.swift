@@ -16,6 +16,7 @@ struct SophrosApp: App {
         WindowGroup {
             MainTabView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .toastHost()
         }
     }
 }

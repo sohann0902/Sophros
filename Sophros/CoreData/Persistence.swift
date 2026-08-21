@@ -170,6 +170,38 @@ struct PersistenceController {
         e3.sets = 3
         e3.template = t2
         
+        let m1 = MealLog(context: viewContext)
+        m1.title = "breakfast"
+        m1.createdAt = .now
+        m1.id = UUID()
+        m1.mealType = .breakfast
+        m1.kindRaw = "log"
+        m1.occuredAt = .now
+        
+        let m2 = MealLog(context: viewContext)
+        m2.title = "Lunch"
+        m2.createdAt = .now
+        m2.id = UUID()
+        m2.mealType = .lunch
+        m2.kindRaw = "log"
+        m2.occuredAt = .now
+        
+        let m3 = MealLog(context: viewContext)
+        m3.title = "Dinner"
+        m3.createdAt = .now
+        m3.id = UUID()
+        m3.mealType = .dinner
+        m3.kindRaw = "log"
+        m3.occuredAt = .now
+        
+        let m4 = MealLog(context: viewContext)
+        m4.title = "Snack"
+        m4.createdAt = .now
+        m4.id = UUID()
+        m4.mealType = .snack
+        m4.kindRaw = "log"
+        m4.occuredAt = .now
+        
         do {
             try viewContext.save()
         } catch {
