@@ -243,7 +243,7 @@ struct PersistenceController {
         } else {
             
             guard let groupURL = FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: "group.Sophros.com"
+                forSecurityApplicationGroupIdentifier: "group.Sohan.Sophros.com"
             ) else {
                 fatalError("Unable to locate App Group container")
             }
