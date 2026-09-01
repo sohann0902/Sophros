@@ -18,12 +18,12 @@ struct Navigator {
             WorkoutDetailView(card: card)
         case .diet:
             DietDetailView(card: card)
-        case .sleep:
-            SleepDetailView(card: card)
         case .cycle:
             CycleDetailView(card: card)
         case .reminders:
             RemindersDetailView(card: card)
+        case .weight:
+            WeightDetailView(card: card)
         }
     }
 }

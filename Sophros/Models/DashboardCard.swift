@@ -9,7 +9,7 @@
 import SwiftUI
 
 enum DashboardCardType {
-    case water, workout, diet, sleep, cycle, reminders
+    case water, diet, workout, reminders, cycle, weight
 }
 
 struct DashboardCard: Identifiable {
@@ -35,17 +35,20 @@ struct DashboardCard: Identifiable {
                   title: "Diet", value: "1,720 / 2,000",
                   subtitle: "Calories"),
         
-            .init(type: .sleep, icon: "moon.fill", iconColor: .purple,
-                  title: "Sleep", value: "7h 15m",
-                  subtitle: "Last Night"),
+            .init(type: .reminders, icon: "calendar", iconColor: .orange,
+                  title: "Reminders", value: "3",
+                  subtitle: "Upcoming")
+    ]
+    
+    static let otherCards : [DashboardCard] = [
+        .init(type: .weight, icon: "calendar", iconColor: .orange,
+              title: "Weight", value: "58kg",
+              subtitle: ""),
         
             .init(type: .cycle, icon: "flame.fill", iconColor: .red,
                   title: "Cycle", value: "Day 5",
                   subtitle: "Follicular Phase"),
         
-            .init(type: .reminders, icon: "calendar", iconColor: .orange,
-                  title: "Reminders", value: "3",
-                  subtitle: "Upcoming")
     ]
 }
 

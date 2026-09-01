@@ -32,10 +32,12 @@ struct CardsView: View {
                     
                     // 1 x 2
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 16) {
-                        ForEach(1...2, id: \.self) { _ in
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(.blue)
-                                .frame(height: geometry.size.height / 4)
+                        ForEach(DashboardCard.otherCards) { card in
+                            NavigationLink {
+                                Navigator.openCardView(for: card)
+                            } label: {
+                                DashboardCardView(card: card, height: geometry.size.height / 4)
+                            }
                         }
                     }
                 }

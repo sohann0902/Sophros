@@ -12,32 +12,35 @@ struct WaterDetailView: View {
     let card : DashboardCard
     @Environment(\.managedObjectContext) private var context
     
-    @FetchRequest private var entries: FetchedResults<WaterEntry>
-    @FetchRequest private var goal: FetchedResults<WaterGoal>
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \WaterEntry.createdAt, ascending: false)
+        ],
+        animation: .default
+    )
+    private var entries: FetchedResults<WaterEntry>
+    @FetchRequest(
+        sortDescriptors: [],
+        animation: .default
+    )
+    private var goal: FetchedResults<WaterGoal>
     
     init(card: DashboardCard) {
         self.card = card
-        
-        let calendar = Calendar.current
-        let startOfToday = calendar.startOfDay(for: .now)
-        let endOfToday = calendar.date(byAdding: .day, value: 1, to: startOfToday)!
-        
-        _entries = FetchRequest(
-            sortDescriptors: [
-                NSSortDescriptor(keyPath: \WaterEntry.createdAt, ascending: false)
-            ],
-            predicate: NSPredicate(
-                format: "createdAt >= %@ AND createdAt < %@",
-                startOfToday as NSDate,
-                endOfToday as NSDate
-            ),
-            animation: .default
-        )
-        
-        _goal = FetchRequest(
-            sortDescriptors: [],
-            animation: .default
-        )
+    }
+
+    @State private var selectedDate = Date()
+    @State private var showingCalendar = false
+
+    private var calendar: Calendar {
+        Calendar.current
+    }
+
+    private var selectedDateEntries: [WaterEntry] {
+        entries.filter { entry in
+            guard let createdAt = entry.createdAt else { return false }
+            return calendar.isDate(createdAt, inSameDayAs: selectedDate)
+        }
     }
     
     private var dailyGoalML: Int {
@@ -45,7 +48,7 @@ struct WaterDetailView: View {
     }
     
     private var totalML: Int {
-        Int(entries.reduce(0) { $0 + $1.amountML })
+        Int(selectedDateEntries.reduce(0) { $0 + $1.amountML })
     }
     
     private var progress: Double {
@@ -55,7 +58,7 @@ struct WaterDetailView: View {
     }
     
     private var lastDrinkML: Int {
-        Int(entries.first?.amountML ?? 0)
+        Int(selectedDateEntries.first?.amountML ?? 0)
     }
     
     @State private var entryBeingEdited: WaterEntry?
@@ -67,11 +70,14 @@ struct WaterDetailView: View {
     private let waterAmounts = Array(stride(from: 0, through: 1000, by: 50))
     
     var body: some View {
-            ZStack(alignment: .bottomTrailing) {
+            ZStack {
                 Colormanager.baseBackground
                     .ignoresSafeArea()
                 
                 List {
+                    datePicker
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                     
                     Section {
                         VStack(spacing: 28) {
@@ -111,7 +117,7 @@ struct WaterDetailView: View {
                     .listRowSeparator(.hidden)
                     
                     Section {
-                        ForEach(entries) { entry in
+                        ForEach(selectedDateEntries) { entry in
                             waterLogRow(entry)
                                 .listRowInsets(
                                     EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16)
@@ -134,16 +140,35 @@ struct WaterDetailView: View {
                                 }
                         }
                     } header: {
-                        Text("Today's Log")
+                        Text("\(selectedDate.relativeDisplayText)'s Log")
                             .foregroundStyle(Colormanager.Typography.primaryText)
                             .font(.title3.weight(.bold))
                     }
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
+
+                if showingCalendar {
+                    Color.black.opacity(0.25)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            showingCalendar = false
+                        }
+
+                    CalendarOverlay(
+                        selectedWeek: $selectedDate,
+                        isPresented: $showingCalendar,
+                        calendar: calendar
+                    )
+                    .padding(20)
+                    .transition(.opacity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 44)
+                }
             }
             .navigationTitle("Water")
             .navigationBarTitleDisplayMode(.inline)
+            .animation(.easeInOut(duration: 0.2), value: showingCalendar)
             .alert("Add Water", isPresented: $presentCustomEntryForm) {
                 TextField("Amount in ml", text: $customWaterEntry)
                     .keyboardType(.numberPad)
@@ -180,6 +205,29 @@ struct WaterDetailView: View {
             } message: {
                 Text("Enter the amount of water in milliliters.")
             }
+    }
+
+    private var datePicker: some View {
+        HStack {
+            Spacer()
+            Button {
+                showingCalendar = true
+            } label: {
+                HStack(spacing: 8) {
+                    Text(selectedDate.relativeDisplayText)
+                        .font(.headline)
+
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.bold))
+                }
+                .foregroundStyle(Colormanager.Typography.primaryText)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .background(Colormanager.card)
+                .clipShape(Capsule())
+            }
+            Spacer()
+        }
     }
     
     private var waterProgress: some View {
@@ -265,12 +313,26 @@ struct WaterDetailView: View {
     }
     
     private func addWater(_ amount: Int) {
+        let entryDate: Date
+
+        if calendar.isDateInToday(selectedDate) {
+            entryDate = .now
+        } else {
+            let time = calendar.dateComponents([.hour, .minute, .second], from: .now)
+            entryDate = calendar.date(
+                bySettingHour: time.hour ?? 0,
+                minute: time.minute ?? 0,
+                second: time.second ?? 0,
+                of: selectedDate
+            ) ?? selectedDate
+        }
+
         let entry = WaterEntry(context: context)
         entry.id = UUID()
         entry.note = "q"
         entry.source = .preset
         entry.amountML = Int64(amount)
-        entry.createdAt = .now
+        entry.createdAt = entryDate
         entry.updatedAt = .now
         
         do {

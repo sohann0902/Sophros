@@ -125,6 +125,11 @@ struct DietDetailView: View {
                     mealList
                     
                 }
+
+                Color.clear
+                    .frame(height: 76)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
@@ -519,4 +524,3 @@ private struct MealLogRow: View {
     DietDetailView(card: DashboardCard.cards[2])
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
-
