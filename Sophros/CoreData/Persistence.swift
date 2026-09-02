@@ -225,6 +225,34 @@ struct PersistenceController {
         m4.kindRaw = "log"
         m4.occuredAt = .now
         
+        let weightSamples: [(dayOffset: Int, weight: Double)] = [
+            (-330, 63.8), (-300, 63.1), (-270, 62.7), (-240, 62.0),
+            (-210, 61.4), (-180, 60.9), (-150, 60.3), (-120, 59.8),
+            (-90, 59.4), (-63, 59.1), (-42, 58.8), (-28, 58.7),
+            (-21, 58.5), (-14, 58.6), (-8, 58.3), (-5, 58.2),
+            (-2, 58.1), (0, 58.0)
+        ]
+
+        for sample in weightSamples {
+            let date = Calendar.current.date(
+                byAdding: .day,
+                value: sample.dayOffset,
+                to: .now
+            )!
+
+            let entry = WeightEntry(context: viewContext)
+            entry.id = UUID()
+            entry.createdAt = date
+            entry.updatedAt = date
+            entry.weight = sample.weight
+        }
+        
+        let wgoal = WeightGoal(context: viewContext)
+        wgoal.createdAt = .now
+        wgoal.updatedAt = .now
+        wgoal.id = UUID()
+        wgoal.weight = 52
+
         do {
             try viewContext.save()
         } catch {
