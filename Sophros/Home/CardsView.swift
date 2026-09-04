@@ -6,12 +6,18 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct CardsView: View {
     let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
+
+    @State private var cards = DashboardCard.cards
+    @State private var otherCards = DashboardCard.otherCards
+    @State private var draggedCard: DashboardCard?
+    @State private var isRearranging = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -20,30 +26,119 @@ struct CardsView: View {
                     
                     // 2 x 3 
                     LazyVGrid(columns: columns, spacing: 8) {
-                        ForEach(DashboardCard.cards) { card in
-                            NavigationLink {
-                                Navigator.openCardView(for: card)
-                            } label: {
-                                DashboardCardView(card: card, height: geometry.size.height / 4)
-                            }
-                            
+                        ForEach(cards) { card in
+                            cardView(card, height: geometry.size.height / 4)
+                                .onDrop(
+                                    of: [UTType.text],
+                                    delegate: CardDropDelegate(
+                                        destination: card,
+                                        cards: $cards,
+                                        draggedCard: $draggedCard,
+                                        isRearranging: isRearranging
+                                    )
+                                )
                         }
                     }
                     
                     // 1 x 2
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 16) {
-                        ForEach(DashboardCard.otherCards) { card in
-                            NavigationLink {
-                                Navigator.openCardView(for: card)
-                            } label: {
-                                DashboardCardView(card: card, height: geometry.size.height / 4)
-                            }
+                        ForEach(otherCards) { card in
+                            cardView(card, height: geometry.size.height / 4)
+                                .onDrop(
+                                    of: [UTType.text],
+                                    delegate: CardDropDelegate(
+                                        destination: card,
+                                        cards: $otherCards,
+                                        draggedCard: $draggedCard,
+                                        isRearranging: isRearranging
+                                    )
+                                )
                         }
                     }
                 }
                 .padding()
             }
         }
+        .toolbar {
+            if isRearranging {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        isRearranging = false
+                        draggedCard = nil
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func cardView(_ card: DashboardCard, height: CGFloat) -> some View {
+        Group {
+            if isRearranging {
+                DashboardCardView(card: card, height: height)
+            } else {
+                NavigationLink {
+                    Navigator.openCardView(for: card)
+                } label: {
+                    DashboardCardView(card: card, height: height)
+                }
+            }
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .onLongPressGesture(minimumDuration: 0.45) {
+            beginRearranging(card)
+        }
+        .onDrag {
+            beginRearranging(card)
+            draggedCard = card
+            return NSItemProvider(object: card.id.uuidString as NSString)
+        }
+        .opacity(draggedCard?.id == card.id ? 0.55 : 1)
+        .rotationEffect(isRearranging ? .degrees(card.id.uuidString.hashValue.isMultiple(of: 2) ? -1 : 1) : .zero)
+        .animation(
+            isRearranging
+                ? .easeInOut(duration: 0.14).repeatForever(autoreverses: true)
+                : .default,
+            value: isRearranging
+        )
+    }
+
+    private func beginRearranging(_ card: DashboardCard) {
+        guard !isRearranging else { return }
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.7)) {
+            isRearranging = true
+        }
+    }
+}
+
+private struct CardDropDelegate: DropDelegate {
+    let destination: DashboardCard
+    @Binding var cards: [DashboardCard]
+    @Binding var draggedCard: DashboardCard?
+    let isRearranging: Bool
+
+    func dropEntered(info: DropInfo) {
+        guard
+            isRearranging,
+            let draggedCard,
+            draggedCard.id != destination.id,
+            let fromIndex = cards.firstIndex(where: { $0.id == draggedCard.id }),
+            let toIndex = cards.firstIndex(where: { $0.id == destination.id })
+        else { return }
+
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            cards.move(
+                fromOffsets: IndexSet(integer: fromIndex),
+                toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+            )
+        }
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        draggedCard = nil
+        return true
     }
 }
 

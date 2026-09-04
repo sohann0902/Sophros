@@ -253,6 +253,46 @@ struct PersistenceController {
         wgoal.id = UUID()
         wgoal.weight = 52
 
+        let cycleSettings = CycleSettings(context: viewContext)
+        cycleSettings.id = UUID()
+        cycleSettings.cycleLength = 30
+        cycleSettings.periodLength = 5
+        cycleSettings.createdAt = .now
+        cycleSettings.updatedAt = .now
+
+        let cycleToday = calendar.startOfDay(for: .now)
+        let periodStartOffsets = [-90, -60, -30, -9]
+
+        for startOffset in periodStartOffsets {
+            let startDate = calendar.date(byAdding: .day, value: startOffset, to: cycleToday)!
+
+            for dayOffset in 0..<5 {
+                let periodDay = calendar.date(byAdding: .day, value: dayOffset, to: startDate)!
+                let log = CycleLog(context: viewContext)
+                log.id = UUID()
+                log.date = periodDay
+                log.isPeriodDay = true
+                log.createdAt = periodDay
+                log.updatedAt = periodDay
+            }
+        }
+
+        let todayCycleLog = CycleLog(context: viewContext)
+        todayCycleLog.id = UUID()
+        todayCycleLog.date = cycleToday
+        todayCycleLog.sexTypeRaw = CycleSexType.protected.rawValue
+        todayCycleLog.createdAt = .now
+        todayCycleLog.updatedAt = .now
+
+        for key in ["headache", "fatigue"] {
+            let symptom = CycleSymptom(context: viewContext)
+            symptom.id = UUID()
+            symptom.symptomKey = key
+            symptom.createdAt = .now
+            symptom.updatedAt = .now
+            symptom.log = todayCycleLog
+        }
+
         do {
             try viewContext.save()
         } catch {

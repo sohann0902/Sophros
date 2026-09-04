@@ -20,6 +20,10 @@ extension Date {
             return "Yesterday"
         }
 
+        if calendar.isDateInTomorrow(self) {
+            return "Tomorrow"
+        }
+
         let day = calendar.component(.day, from: self)
 
         let formatter = DateFormatter()
@@ -28,5 +32,4 @@ extension Date {
         return "\(day)\(day.ordinalSuffix) \(formatter.string(from: self))"
     }
 }
-
 

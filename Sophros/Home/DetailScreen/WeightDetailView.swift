@@ -82,7 +82,8 @@ struct WeightDetailView: View {
                 .padding(.bottom, 32)
             }
         }
-        .navigationBarBackButtonHidden()
+        .navigationTitle("Weight")
+        .navigationBarTitleDisplayMode(.inline)
         .alert("Log weight", isPresented: $showingLogWeight) {
             TextField("Weight in kg", text: $weightText)
                 .keyboardType(.decimalPad)

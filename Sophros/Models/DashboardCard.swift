@@ -23,15 +23,15 @@ struct DashboardCard: Identifiable {
     var progress: Double? = nil
     
     static let cards : [DashboardCard] = [
-        .init(type: .water, icon: "drop.fill", iconColor: .blue,
+        .init(type: .water, icon: "waterbottle.fill", iconColor: .blue,
               title: "Water", value: "1.8 / 2.5 L",
               subtitle: "72%", progress: 0.72),
         
-            .init(type: .workout, icon: "figure.run", iconColor: .green,
+            .init(type: .workout, icon: "figure.strengthtraining.traditional", iconColor: .green,
                   title: "Workout", value: "Push Day",
                   subtitle: "5 Exercises"),
         
-            .init(type: .diet, icon: "sun.max.fill", iconColor: .orange,
+            .init(type: .diet, icon: "fork.knife", iconColor: .orange,
                   title: "Diet", value: "1,720 / 2,000",
                   subtitle: "Calories"),
         
@@ -41,11 +41,11 @@ struct DashboardCard: Identifiable {
     ]
     
     static let otherCards : [DashboardCard] = [
-        .init(type: .weight, icon: "calendar", iconColor: .orange,
+        .init(type: .weight, icon: "scalemass.fill", iconColor: .orange,
               title: "Weight", value: "58kg",
               subtitle: ""),
         
-            .init(type: .cycle, icon: "flame.fill", iconColor: .red,
+            .init(type: .cycle, icon: "drop.fill", iconColor: .red,
                   title: "Cycle", value: "Day 5",
                   subtitle: "Follicular Phase"),
         
