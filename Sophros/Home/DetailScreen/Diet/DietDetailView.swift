@@ -21,18 +21,28 @@ struct DietDetailView: View {
     )
     
     private var mealLogs: FetchedResults<MealLog>
+
+    @FetchRequest(sortDescriptors: [], animation: .default)
+    private var nutritionGoals: FetchedResults<NutritionGoal>
     
     @State private var selectedDate = Date()
     @State private var showingAddMeal = false
     @State private var showingCalendar = false
-    
-    // Temporary targets — move these to NutritionGoal later.
-    private let calorieTarget = 2_000.0
-    private let proteinTarget = 120.0
-    private let carbsTarget = 250.0
-    private let fatTarget = 70.0
-    private let fiberTarget = 30.0
-    private let sugarLimit = 35.0
+    @State private var showingGoalOnboarding = false
+    @State private var calorieInput = "2000"
+    @State private var proteinInput = "120"
+    @State private var fatInput = "70"
+    @State private var carbsInput = "250"
+    @State private var fiberInput = "30"
+    @State private var sugarInput = "35"
+
+    private var nutritionGoal: NutritionGoal? { nutritionGoals.first }
+    private var calorieTarget: Double { nutritionGoal?.calorie ?? 2_000 }
+    private var proteinTarget: Double { nutritionGoal?.protein ?? 120 }
+    private var carbsTarget: Double { nutritionGoal?.carbs ?? 250 }
+    private var fatTarget: Double { nutritionGoal?.fat ?? 70 }
+    private var fiberTarget: Double { nutritionGoal?.fiber ?? 30 }
+    private var sugarLimit: Double { nutritionGoal?.sugar ?? 35 }
     
     private var calendar: Calendar {
         Calendar.current
@@ -174,6 +184,32 @@ struct DietDetailView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .padding(.top, 44)
             }
+
+            if showingGoalOnboarding {
+                FeatureOnboardingOverlay(
+                    icon: "fork.knife",
+                    tint: Colormanager.Diet.apricot,
+                    title: "Set your nutrition targets",
+                    message: "Set daily targets to make your meal summary useful from day one. You can edit them anytime.",
+                    actionTitle: "Save targets",
+                    actionEnabled: validNutritionInputs,
+                    content: {
+                        VStack(spacing: 8) {
+                            OnboardingNumericField(title: "Calories", unit: "kcal", placeholder: "2000", value: $calorieInput)
+                            HStack(spacing: 8) {
+                                OnboardingNumericField(title: "Protein", unit: "g", placeholder: "120", value: $proteinInput)
+                                OnboardingNumericField(title: "Carbs", unit: "g", placeholder: "250", value: $carbsInput)
+                            }
+                            HStack(spacing: 8) {
+                                OnboardingNumericField(title: "Fat", unit: "g", placeholder: "70", value: $fatInput)
+                                OnboardingNumericField(title: "Fiber", unit: "g", placeholder: "30", value: $fiberInput)
+                            }
+                            OnboardingNumericField(title: "Sugar limit", unit: "g", placeholder: "35", value: $sugarInput)
+                        }
+                    },
+                    action: saveNutritionGoal
+                )
+            }
         }
         .navigationTitle("Diet")
         .navigationBarTitleDisplayMode(.inline)
@@ -181,6 +217,28 @@ struct DietDetailView: View {
         .sheet(isPresented: $showingAddMeal) {
             AddMealView(mealDate: selectedDate)
         }
+        .onAppear { showingGoalOnboarding = nutritionGoals.isEmpty }
+    }
+
+    private var validNutritionInputs: Bool {
+        let values = [calorieInput, proteinInput, fatInput, carbsInput, fiberInput, sugarInput]
+        return values.allSatisfy { (Double($0) ?? 0) > 0 }
+    }
+
+    private func saveNutritionGoal() {
+        guard validNutritionInputs,
+              let calorie = Double(calorieInput), let protein = Double(proteinInput),
+              let fat = Double(fatInput), let carbs = Double(carbsInput),
+              let fiber = Double(fiberInput), let sugar = Double(sugarInput) else { return }
+        let goal = NutritionGoal(context: viewContext)
+        goal.calorie = calorie
+        goal.protein = protein
+        goal.fat = fat
+        goal.carbs = carbs
+        goal.fiber = fiber
+        goal.sugar = sugar
+        try? viewContext.save()
+        showingGoalOnboarding = false
     }
     
     private var datePicker: some View {

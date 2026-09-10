@@ -17,6 +17,8 @@ struct WeightDetailView: View {
     @State private var showingGoalEditor = false
     @State private var weightText = ""
     @State private var goalText = ""
+    @State private var showingGoalOnboarding = false
+    @State private var onboardingGoalText = ""
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \WeightEntry.createdAt, ascending: false)],
@@ -81,9 +83,25 @@ struct WeightDetailView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 32)
             }
+
+            if showingGoalOnboarding {
+                FeatureOnboardingOverlay(
+                    icon: "scalemass.fill",
+                    tint: Colormanager.Sleep.periwinkle,
+                    title: "Set your target weight",
+                    message: "Choose a weight you want to work toward. You can update this at any time.",
+                    actionTitle: "Save target",
+                    actionEnabled: validOnboardingGoal,
+                    content: {
+                        OnboardingNumericField(title: "Target weight", unit: "kg", placeholder: "65", value: $onboardingGoalText)
+                    },
+                    action: saveOnboardingGoal
+                )
+            }
         }
         .navigationTitle("Weight")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear { showingGoalOnboarding = weightGoals.isEmpty }
         .alert("Log weight", isPresented: $showingLogWeight) {
             TextField("Weight in kg", text: $weightText)
                 .keyboardType(.decimalPad)
@@ -208,14 +226,30 @@ struct WeightDetailView: View {
     }
 
     private func setGoal() {
-        guard let goal = weightGoals.first,
-              let value = Double(goalText),
-              value > 0 else { return }
+        guard let value = Double(goalText), value > 0 else { return }
 
+        let goal = weightGoals.first ?? WeightGoal(context: context)
+        if goal.id == nil {
+            goal.id = UUID()
+            goal.createdAt = .now
+        }
         goal.weight = value
         goal.updatedAt = .now
         try? context.save()
         goalText = ""
+    }
+
+    private var validOnboardingGoal: Bool {
+        guard let value = Double(onboardingGoalText) else { return false }
+        return (20...300).contains(value)
+    }
+
+    private func saveOnboardingGoal() {
+        guard validOnboardingGoal else { return }
+        goalText = onboardingGoalText
+        setGoal()
+        onboardingGoalText = ""
+        showingGoalOnboarding = false
     }
 }
 

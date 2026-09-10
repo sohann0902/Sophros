@@ -116,6 +116,7 @@ struct WorkoutDetailView: View {
     }
     
     @State private var showingCalendar = false
+    @AppStorage("hasSeenWorkoutOnboarding") private var hasSeenWorkoutOnboarding = false
 
     var body: some View {
         ZStack {
@@ -151,6 +152,18 @@ struct WorkoutDetailView: View {
                 )
                 .padding(20)
                 .transition(.opacity)
+            }
+
+            if !hasSeenWorkoutOnboarding {
+                FeatureOnboardingOverlay(
+                    icon: "figure.strengthtraining.traditional",
+                    tint: Colormanager.Workout.terracotta,
+                    title: "Make workouts repeatable",
+                    message: "Create templates for the routines you love, then log them each day without rebuilding every exercise.",
+                    content: { EmptyView() }
+                ) {
+                    hasSeenWorkoutOnboarding = true
+                }
             }
         }
         .animation(.easeInOut(duration: 0.2), value: showingCalendar)

@@ -6,23 +6,33 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct HomeView : View {
-    
-    
+
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \UserProfile.createdAt, ascending: true)],
+        animation: nil
+    ) private var profiles: FetchedResults<UserProfile>
+
+    private var greetingName: String {
+        let name = profiles.first?.name ?? ""
+        return name.isEmpty ? "there" : name
+    }
+
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
-                
+
                 ZStack(alignment: .topLeading) {
                     Colormanager.baseBackground
                         .ignoresSafeArea()
-                    
+
                     //titleView
                     VStack(alignment: .leading) {
-                        
+
                         HStack(alignment: .top) {
-                            Text("Welcome back,\nSohan")
+                            Text("Welcome back,\n\(greetingName)")
                                 .font(.system(size: 32, weight: .heavy))
                             
                             Spacer()
@@ -45,4 +55,5 @@ struct HomeView : View {
 
 #Preview {
     HomeView()
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

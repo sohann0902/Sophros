@@ -16,4 +16,31 @@ public class UserProfile: NSManagedObject {
     var name : String {
         return displayName ?? ""
     }
+
+    var gender: Gender {
+        get {
+            return Gender(rawValue: genderRaw ?? "") ?? .preferNotToSay
+        }
+        set {
+            genderRaw = newValue.rawValue
+        }
+    }
+}
+
+enum Gender: String, CaseIterable, Identifiable {
+    case female
+    case male
+    case other
+    case preferNotToSay
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .female: return "Female"
+        case .male: return "Male"
+        case .other: return "Other"
+        case .preferNotToSay: return "Prefer not to say"
+        }
+    }
 }

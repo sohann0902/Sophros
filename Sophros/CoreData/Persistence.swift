@@ -81,6 +81,8 @@ struct PersistenceController {
                 of: day
             )!
         }
+        
+        let user = UserProfile(context: viewContext)
 
         // Monday: Push Day
         let pushDay = WorkoutSession(context: viewContext)

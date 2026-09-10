@@ -37,6 +37,7 @@ struct RemindersDetailView: View {
     @State private var reminderBeingEdited: Reminder?
     @State private var showingNewReminder = false
     @State private var editMode: EditMode = .inactive
+    @AppStorage("hasSeenRemindersOnboarding") private var hasSeenRemindersOnboarding = false
 
     private var displayedReminders: [Reminder] {
         selectedList == .upcoming
@@ -109,6 +110,18 @@ struct RemindersDetailView: View {
             .buttonStyle(PressableButtonStyle())
             .padding(.trailing, 24)
             .padding(.bottom, 22)
+
+            if !hasSeenRemindersOnboarding {
+                FeatureOnboardingOverlay(
+                    icon: "bell.badge.fill",
+                    tint: Colormanager.Accent.button,
+                    title: "Stay on top of what matters",
+                    message: "Add one-off or repeating reminders for habits, appointments, and anything you do not want to forget.",
+                    content: { EmptyView() }
+                ) {
+                    hasSeenRemindersOnboarding = true
+                }
+            }
         }
         .navigationTitle("Reminders")
         .navigationBarTitleDisplayMode(.inline)

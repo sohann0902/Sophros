@@ -19,6 +19,7 @@ struct CycleDetailView: View {
     @State private var scrollToTodayRequest = 0
     @State private var cycleDataRevision = 0
     @State private var hasStartedHealthKitImport = false
+    @AppStorage("hasSeenCycleOnboarding") private var hasSeenCycleOnboarding = false
 
     private let calendar = Calendar.current
 
@@ -79,6 +80,18 @@ struct CycleDetailView: View {
                         summaryCard
                     }
                     .padding(.bottom, 32)
+                }
+
+                if !hasSeenCycleOnboarding {
+                    FeatureOnboardingOverlay(
+                        icon: "drop.fill",
+                        tint: Colormanager.MenstrualCycle.mauve,
+                        title: "Your cycle, in one place",
+                        message: "Log period days and symptoms to see your cycle history and predicted phases. Your information stays on your device.",
+                        content: { EmptyView() }
+                    ) {
+                        hasSeenCycleOnboarding = true
+                    }
                 }
             }
             .navigationTitle("Cycle")

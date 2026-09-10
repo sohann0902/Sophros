@@ -31,6 +31,8 @@ struct WaterDetailView: View {
 
     @State private var selectedDate = Date()
     @State private var showingCalendar = false
+    @State private var showingGoalOnboarding = false
+    @State private var goalInput = "2500"
 
     private var calendar: Calendar {
         Calendar.current
@@ -165,10 +167,26 @@ struct WaterDetailView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     .padding(.top, 44)
                 }
+
+                if showingGoalOnboarding {
+                    FeatureOnboardingOverlay(
+                        icon: "drop.fill",
+                        tint: Colormanager.Water.deepBlue,
+                        title: "Set your water goal",
+                        message: "Choose how much water you want to drink each day. You can change this anytime.",
+                        actionTitle: "Save goal",
+                        actionEnabled: validGoalInput,
+                        content: {
+                            OnboardingNumericField(title: "Daily intake", unit: "ml", placeholder: "2500", value: $goalInput)
+                        },
+                        action: saveGoal
+                    )
+                }
             }
             .navigationTitle("Water")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.easeInOut(duration: 0.2), value: showingCalendar)
+            .onAppear { showingGoalOnboarding = goal.isEmpty }
             .alert("Add Water", isPresented: $presentCustomEntryForm) {
                 TextField("Amount in ml", text: $customWaterEntry)
                     .keyboardType(.numberPad)
@@ -205,6 +223,22 @@ struct WaterDetailView: View {
             } message: {
                 Text("Enter the amount of water in milliliters.")
             }
+    }
+
+    private var validGoalInput: Bool {
+        guard let amount = Int(goalInput) else { return false }
+        return (250...10_000).contains(amount)
+    }
+
+    private func saveGoal() {
+        guard let amount = Int(goalInput), (250...10_000).contains(amount) else { return }
+        let waterGoal = WaterGoal(context: context)
+        waterGoal.id = UUID()
+        waterGoal.amountML = Int64(amount)
+        waterGoal.createdAt = .now
+        waterGoal.updatedAt = .now
+        try? context.save()
+        showingGoalOnboarding = false
     }
 
     private var datePicker: some View {

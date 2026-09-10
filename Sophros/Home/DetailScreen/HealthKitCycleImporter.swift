@@ -129,7 +129,7 @@ final class HealthKitCycleImporter {
         // HealthKit can also contain an explicit “no flow” sample for a day.
         // It belongs to the same category type, but it must never become a
         // logged period day in Sophros.
-        guard sample.value != HKCategoryValueMenstrualFlow.none.rawValue else {
+        guard sample.value != HKCategoryValueVaginalBleeding.none.rawValue else {
             return []
         }
 
