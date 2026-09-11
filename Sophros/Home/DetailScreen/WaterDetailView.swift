@@ -31,7 +31,7 @@ struct WaterDetailView: View {
 
     @State private var selectedDate = Date()
     @State private var showingCalendar = false
-    @State private var showingGoalOnboarding = false
+    @State private var showingGoalOnboarding = true
     @State private var goalInput = "2500"
 
     private var calendar: Calendar {
@@ -119,6 +119,12 @@ struct WaterDetailView: View {
                     .listRowSeparator(.hidden)
                     
                     Section {
+						if selectedDateEntries.isEmpty {
+							Text("No entries")
+								.listRowBackground(Color.clear)
+								.listRowSeparator(.hidden)
+						}
+						
                         ForEach(selectedDateEntries) { entry in
                             waterLogRow(entry)
                                 .listRowInsets(
@@ -149,6 +155,7 @@ struct WaterDetailView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
+				.safeAreaPadding(.bottom, 24)
 
                 if showingCalendar {
                     Color.black.opacity(0.25)
@@ -160,7 +167,9 @@ struct WaterDetailView: View {
                     CalendarOverlay(
                         selectedWeek: $selectedDate,
                         isPresented: $showingCalendar,
-                        calendar: calendar
+                        calendar: calendar,
+						background: Colormanager.Water.lightBlue,
+						tint: Colormanager.Water.deepBlue
                     )
                     .padding(20)
                     .transition(.opacity)

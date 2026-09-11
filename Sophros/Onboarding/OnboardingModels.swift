@@ -83,12 +83,12 @@ struct OnboardingDraft {
             return gender != nil
         case .age:
             guard let age else { return false }
-            return (1...120).contains(age)
+            return (1...200).contains(age)
         case .height:
             return true
         case .weight:
             guard let weightKg else { return false }
-            return (20...300).contains(weightKg)
+            return true
         }
     }
 }

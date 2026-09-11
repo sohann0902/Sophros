@@ -37,7 +37,7 @@ struct HomeView : View {
                             
                             Spacer()
                             
-                            StreakView(streakCount: 1)
+//                            StreakView(streakCount: 1)
                         }
                         .foregroundStyle(Colormanager.Typography.primaryText)
                         .padding()

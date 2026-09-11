@@ -11,58 +11,50 @@ import SwiftUI
 
 /// The intro screen shown before the info wizard begins.
 struct WelcomeStepView: View {
+	let shouldAnimateFlower: Bool
     let onStart: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Spacer()
-
-//            Image(systemName: "heart.text.square.fill")
-//                .font(.system(size: 72))
-//                .foregroundStyle(Colormanager.Accent.selected)
-
-            Text("Welcome to \nSophros")
-                .font(.system(size: 34, weight: .heavy))
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Colormanager.Typography.primaryText)
-
-            Text("Your personal space for tracking water, weight, workouts, nutrition and your cycle — all in one calm place.")
-                .font(.system(size: 17, weight: .medium))
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Colormanager.Typography.secondaryText)
-                .padding(.horizontal)
-
-            Spacer()
-
-            Button(action: onStart) {
-                Text("Get Started")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Colormanager.Accent.button)
-                    )
-            }
-        }
-        .padding()
-    }
-}
-
-
-struct Splashscreen : View {
-    var body: some View {
-        ZStack {
-            Colormanager.baseBackground
-            
-            Image("Sophros")
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 200)
-                .tint(Colormanager.Accent.selected)
-        }
+		ZStack(alignment: .center) {
+			
+			LinearGradient(colors: [
+				.clear,
+				Colormanager.Surfaces.border.opacity(0.3), Colormanager.Surfaces.border.opacity(0.5), Colormanager.Surfaces.border.opacity(0.7), Colormanager.Surfaces.border.opacity(0.1), .clear
+			], startPoint: .top, endPoint: .bottom)
+			.ignoresSafeArea()
+			
+			VStack(spacing: 8) {
+				
+				FlowerBloom(shouldBloom: shouldAnimateFlower)
+				
+				Text("Welcome to Sophros")
+					.font(.system(size: 34, weight: .heavy))
+					.multilineTextAlignment(.center)
+					.foregroundStyle(Colormanager.Typography.primaryText)
+				
+				Text("Water, workouts, food, sleep, cycle, one place to keep track of it all.")
+					.font(.system(size: 16, weight: .medium))
+					.multilineTextAlignment(.center)
+					.foregroundStyle(Colormanager.Typography.secondaryText)
+					.padding(.horizontal)
+						.padding(.bottom)
+				
+				
+				Button(action: onStart) {
+					Text("Get Started")
+						.font(.system(size: 18, weight: .bold))
+						.foregroundStyle(.white)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 16)
+						.background(
+							RoundedRectangle(cornerRadius: 16)
+								.fill(Colormanager.Accent.button)
+						)
+				}
+				.padding(.bottom)
+			}
+			.padding()
+		}
     }
 }
 
@@ -100,9 +92,6 @@ struct GenderStepView: View {
                         Text(option.title)
                             .font(.system(size: 18, weight: .semibold))
                         Spacer()
-                        if isSelected {
-                            Image(systemName: "checkmark.circle.fill")
-                        }
                     }
                     .foregroundStyle(isSelected ? .white : Colormanager.Typography.primaryText)
                     .padding()
@@ -112,7 +101,7 @@ struct GenderStepView: View {
                             .fill(isSelected ? Colormanager.Accent.selected : Colormanager.secondaryBg)
                     )
                 }
-                .buttonStyle(PressableButtonStyle())
+				.buttonStyle(.plain)
             }
         }
     }
@@ -207,5 +196,7 @@ private struct OnboardingFieldStyle: ViewModifier {
 }
 
 #Preview {
-    Splashscreen()
+	WelcomeStepView(shouldAnimateFlower: true) {
+		
+	}
 }

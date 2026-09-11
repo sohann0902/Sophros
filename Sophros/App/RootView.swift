@@ -13,12 +13,40 @@ import CoreData
 /// is saved and the flag is set.
 struct RootView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var showSplash = true
+    @State private var isLaunchContentVisible = false
 
     var body: some View {
-        if hasCompletedOnboarding {
-            MainTabView()
-        } else {
-            OnboardingView()
+        ZStack {
+            if hasCompletedOnboarding {
+                MainTabView()
+                    .transition(.opacity)
+            } else {
+                OnboardingView(shouldAnimateWelcome: isLaunchContentVisible)
+                    .transition(.opacity)
+            }
+//
+            if showSplash {
+                Splashscreen {
+                    dismissSplash()
+                }
+                .transition(.opacity)
+                .zIndex(1)
+            }
+        }
+        .animation(.easeInOut(duration: 0.6), value: showSplash)
+        .animation(.easeInOut(duration: 0.6), value: hasCompletedOnboarding)
+    }
+
+    private func dismissSplash() {
+        withAnimation(.easeInOut(duration: 0.6)) {
+            showSplash = false
+        }
+
+        Task {
+            try? await Task.sleep(for: .seconds(0.6))
+            guard !Task.isCancelled else { return }
+            isLaunchContentVisible = true
         }
     }
 }

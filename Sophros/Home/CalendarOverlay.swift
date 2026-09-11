@@ -12,18 +12,24 @@ struct CalendarOverlay: View {
     @Binding var isPresented: Bool
 
     let calendar: Calendar
+	let backgroundColor: Color
+	let tintColor: Color
 
     @State private var pickedDate: Date
 
     init(
         selectedWeek: Binding<Date>,
         isPresented: Binding<Bool>,
-        calendar: Calendar
+        calendar: Calendar,
+		background: Color,
+		tint: Color
     ) {
         _selectedWeek = selectedWeek
         _isPresented = isPresented
         self.calendar = calendar
         _pickedDate = State(initialValue: selectedWeek.wrappedValue)
+		self.backgroundColor = background
+		self.tintColor = tint
     }
 
     var body: some View {
@@ -36,7 +42,7 @@ struct CalendarOverlay: View {
             )
             .datePickerStyle(.graphical)
             .environment(\.calendar, calendar)
-            .tint(.pink.opacity(0.3))
+            .tint(tintColor.opacity(0.3))
             .colorMultiply(Colormanager.Typography.primaryText)
 
             Text("Week: \(weekRangeText)")
@@ -44,7 +50,7 @@ struct CalendarOverlay: View {
                 .foregroundStyle(Colormanager.Typography.secondaryText)
         }
         .padding()
-        .background(Colormanager.Workout.sand)
+        .background(backgroundColor)
         .clipShape(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
         )

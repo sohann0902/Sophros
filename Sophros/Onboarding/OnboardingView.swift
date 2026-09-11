@@ -13,69 +13,129 @@ import CoreData
 struct OnboardingView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @Environment(\.managedObjectContext) private var context
+    let shouldAnimateWelcome: Bool
 
-    @State private var step: OnboardingStep = .welcome
+	@State private var step: OnboardingStep = .welcome
     @State private var draft = OnboardingDraft()
+    @State private var showAllSet = false
 
     var body: some View {
         ZStack {
-            Colormanager.baseBackground
+			Color.white
                 .ignoresSafeArea()
 
-            if step == .welcome {
-                WelcomeStepView(onStart: advance)
+            if showAllSet {
+                allSetView
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+            } else if step == .welcome {
+                WelcomeStepView(
+                    shouldAnimateFlower: shouldAnimateWelcome,
+                    onStart: advance
+                )
                     .transition(.opacity)
             } else {
                 wizard
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .transition(.opacity)
             }
         }
         .preferredColorScheme(.light)
+    }
+
+	var allSetView: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Text("You're all set!")
+                .font(.system(size: 34, weight: .heavy))
+                .foregroundStyle(Colormanager.Typography.primaryText)
+
+            Text("Let's keep everything in balance, starting today.")
+                .font(.system(size: 17, weight: .medium))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Colormanager.Typography.secondaryText)
+                .padding(.horizontal, 32)
+			
+			
+			Button {
+				begin()
+			} label: {
+				ZStack {
+					Circle()
+						.fill(.selected)
+						.frame(width: 80)
+					
+					Image(systemName: "arrow.right")
+						.resizable()
+						.scaledToFit()
+						.frame(width: 40)
+						.foregroundStyle(.white)
+				}
+			}
+			.buttonStyle(PressableButtonStyle())
+
+            Spacer()
+
+        }
+        .padding()
     }
     
     // MARK: - Wizard scaffold
 
     private var wizard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(step.title)
-                            .font(.system(size: 28, weight: .heavy))
-                            .foregroundStyle(Colormanager.Typography.primaryText)
-
-                        Text(step.subtitle)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(Colormanager.Typography.secondaryText)
-                    }
-
-                    stepContent
-                }
-                .padding(.horizontal)
-                .padding(.top, 24)
-            }
-
-            continueButton
-        }
+		NavigationStack {
+			VStack(alignment: .leading, spacing: 0) {
+				header
+				
+				ScrollView {
+					VStack(alignment: .leading, spacing: 24) {
+						VStack(alignment: .leading, spacing: 8) {
+							Text(step.title)
+								.font(.system(size: 28, weight: .heavy))
+								.foregroundStyle(Colormanager.Typography.primaryText)
+							
+							Text(step.subtitle)
+								.font(.system(size: 16, weight: .medium))
+								.foregroundStyle(Colormanager.Typography.secondaryText)
+						}
+						
+						stepContent
+					}
+					.padding(.horizontal)
+					.padding(.top, 24)
+				}
+				
+			}
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Button(action: goBack) {
+						Image(systemName: "chevron.left")
+							.font(.system(size: 18, weight: .bold))
+							.foregroundStyle(Colormanager.Typography.primaryText)
+					}
+				}
+				
+				ToolbarItem(placement: .topBarTrailing) {
+					Button(action: advance) {
+						Image(systemName: "checkmark")
+							.resizable()
+							.renderingMode(.template)
+							.scaledToFit()
+							.foregroundStyle(.white)
+							.opacity(draft.isValid(for: step) ? 1 : 0.4)
+					}
+					.disabled(!draft.isValid(for: step))
+					.buttonStyle(.glassProminent)
+					.tint(.selected)
+				}
+			}
+		}
     }
 
     private var header: some View {
         VStack(spacing: 16) {
-            HStack {
-                Button(action: goBack) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(Colormanager.Typography.primaryText)
-                }
-                .glassEffect()
-
-                Spacer()
-            }
-
-            ProgressView(value: step.progress)
-                .tint(Colormanager.Accent.selected)
+			
+			ProgressView(value: step.progress)
+				.tint(Colormanager.Accent.selected)
         }
         .padding(.horizontal)
         .padding(.top, 8)
@@ -122,8 +182,10 @@ struct OnboardingView: View {
 
     private func advance() {
         if step.isLast {
+			dismissKeyboard()
             finish()
         } else if let next = step.next() {
+			if next == .gender { dismissKeyboard() }
             withAnimation(.easeInOut) { step = next }
         }
     }
@@ -159,15 +221,23 @@ struct OnboardingView: View {
 
         do {
             try context.save()
-            hasCompletedOnboarding = true
+
+            withAnimation(.easeInOut(duration: 0.35)) {
+                showAllSet = true
+            }
         } catch {
             // Leave the flag unset so onboarding is retried on next launch.
             print("Failed to save UserProfile during onboarding: \(error)")
         }
     }
+
+    private func begin() {
+        hasCompletedOnboarding = true
+    }
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView(shouldAnimateWelcome: true)
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+	//
 }

@@ -148,7 +148,9 @@ struct WorkoutDetailView: View {
                 CalendarOverlay(
                     selectedWeek: $selectedWeek,
                     isPresented: $showingCalendar,
-                    calendar: calendar
+                    calendar: calendar,
+					background: Colormanager.Water.lightBlue,
+					tint: Colormanager.Water.skyBlue
                 )
                 .padding(20)
                 .transition(.opacity)

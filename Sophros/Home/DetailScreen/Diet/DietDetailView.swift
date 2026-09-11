@@ -177,7 +177,9 @@ struct DietDetailView: View {
                 CalendarOverlay(
                     selectedWeek: $selectedDate,
                     isPresented: $showingCalendar,
-                    calendar: calendar
+                    calendar: calendar,
+					background: Colormanager.Water.lightBlue,
+					tint: Colormanager.Water.skyBlue
                 )
                 .padding(20)
                 .transition(.opacity)

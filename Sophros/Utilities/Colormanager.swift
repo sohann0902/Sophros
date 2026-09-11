@@ -75,6 +75,7 @@ struct Colormanager {
         static let card: Color = Color("surfacesCard")
         static let secondaryCard: Color = Color("surfacesSecondaryCard")
         static let border: Color = Color("surfacesBorder")
+		static let logoColor: Color = Color("Logo-color")
     }
 
     struct Status {
