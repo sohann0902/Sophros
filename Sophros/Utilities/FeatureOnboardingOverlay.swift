@@ -7,7 +7,6 @@ import SwiftUI
 
 /// A lightweight, first-use explanation or setup prompt shown over a feature.
 struct FeatureOnboardingOverlay<Content: View>: View {
-    let icon: String
     let tint: Color
     let title: String
     let message: String
@@ -15,10 +14,11 @@ struct FeatureOnboardingOverlay<Content: View>: View {
     let actionEnabled: Bool
     let content: Content
     let action: () -> Void
+	let background: Color
 
     init(
-        icon: String,
         tint: Color,
+		background: Color,
         title: String,
         message: String,
         actionTitle: String = "Continue",
@@ -26,8 +26,8 @@ struct FeatureOnboardingOverlay<Content: View>: View {
         @ViewBuilder content: () -> Content,
         action: @escaping () -> Void
     ) {
-        self.icon = icon
         self.tint = tint
+		self.background = background
         self.title = title
         self.message = message
         self.actionTitle = actionTitle
@@ -42,14 +42,14 @@ struct FeatureOnboardingOverlay<Content: View>: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 18) {
-                Image(systemName: icon)
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundStyle(tint)
-                    .frame(width: 58, height: 58)
-                    .background(tint.opacity(0.14), in: Circle())
+//                Image(systemName: icon)
+//                    .font(.system(size: 30, weight: .bold))
+//                    .foregroundStyle(tint)
+//                    .frame(width: 58, height: 58)
+//                    .background(tint.opacity(0.14), in: Circle())
 
                 Text(title)
-                    .font(.system(size: 26, weight: .heavy))
+                    .font(.system(size: 22, weight: .heavy))
                     .foregroundStyle(Colormanager.Typography.primaryText)
 
                 Text(message)
@@ -64,13 +64,25 @@ struct FeatureOnboardingOverlay<Content: View>: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 15)
-                        .background(Colormanager.Accent.button, in: RoundedRectangle(cornerRadius: 15))
+                        .background(background, in: RoundedRectangle(cornerRadius: 15))
                 }
                 .disabled(!actionEnabled)
                 .opacity(actionEnabled ? 1 : 0.45)
             }
             .padding(24)
-            .background(Colormanager.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .background(
+				ZStack {
+					Colormanager.card
+					LinearGradient(colors: [
+						tint.opacity(0.2),
+						tint.opacity(0.1),
+						tint.opacity(0.2),
+						.clear
+					], startPoint: .top, endPoint: .bottom)
+				})
+			.clipShape(
+				RoundedRectangle(cornerRadius: 28, style: .continuous)
+			)
             .padding(24)
         }
         .accessibilityAddTraits(.isModal)
@@ -98,6 +110,6 @@ struct OnboardingNumericField: View {
                 .foregroundStyle(Colormanager.Typography.secondaryText)
         }
         .padding(14)
-        .background(Colormanager.secondaryBg, in: RoundedRectangle(cornerRadius: 13))
+		.background(.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 13))
     }
 }

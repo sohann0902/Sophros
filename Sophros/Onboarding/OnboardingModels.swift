@@ -87,7 +87,7 @@ struct OnboardingDraft {
         case .height:
             return true
         case .weight:
-            guard let weightKg else { return false }
+            guard let _ = weightKg else { return false }
             return true
         }
     }

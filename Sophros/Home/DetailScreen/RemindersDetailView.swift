@@ -113,8 +113,7 @@ struct RemindersDetailView: View {
 
             if !hasSeenRemindersOnboarding {
                 FeatureOnboardingOverlay(
-                    icon: "bell.badge.fill",
-                    tint: Colormanager.Accent.button,
+					tint: Colormanager.Accent.button, background: .red,
                     title: "Stay on top of what matters",
                     message: "Add one-off or repeating reminders for habits, appointments, and anything you do not want to forget.",
                     content: { EmptyView() }

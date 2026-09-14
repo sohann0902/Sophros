@@ -158,8 +158,7 @@ struct WorkoutDetailView: View {
 
             if !hasSeenWorkoutOnboarding {
                 FeatureOnboardingOverlay(
-                    icon: "figure.strengthtraining.traditional",
-                    tint: Colormanager.Workout.terracotta,
+					tint: Colormanager.Workout.terracotta, background: .red,
                     title: "Make workouts repeatable",
                     message: "Create templates for the routines you love, then log them each day without rebuilding every exercise.",
                     content: { EmptyView() }

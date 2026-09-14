@@ -83,14 +83,14 @@ struct CycleDetailView: View {
                 }
 
                 if !hasSeenCycleOnboarding {
-                    FeatureOnboardingOverlay(
-                        icon: "drop.fill",
-                        tint: Colormanager.MenstrualCycle.mauve,
-                        title: "Your cycle, in one place",
-                        message: "Log period days and symptoms to see your cycle history and predicted phases. Your information stays on your device.",
-                        content: { EmptyView() }
-                    ) {
+					FeatureOnboardingOverlay(
+						tint: Colormanager.MenstrualCycle.blush, background: Colormanager.MenstrualCycle.dustyRose,
+						title: "Your cycle, in one place",
+						message: "Log period days and symptoms to see your cycle history and predicted phases. Your information stays on your device.",
+						content: { EmptyView() }
+					) {
                         hasSeenCycleOnboarding = true
+						importHealthKitHistoryForTesting()
                     }
                 }
             }
@@ -98,8 +98,9 @@ struct CycleDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 scrollPosition = selectedDate
-                _ = try? store.settings()
-                importHealthKitHistoryForTesting()
+                // The engine already supplies default settings when none have
+                // been saved, so an empty state does not need a Core Data write.
+//                importHealthKitHistoryForTesting()
             }
             .sheet(isPresented: $showingPeriodOptions) {
                 PeriodLogSheet(
@@ -781,7 +782,7 @@ private struct SymptomPickerSheet: View {
                     .init(color: .clear, location: 0.0),
                     .init(color: .black, location: 0.1),
                     .init(color: .black, location: 0.9),
-                    .init(color: .clear, location: 0.0)
+                    .init(color: .clear, location: 1)
                 ], startPoint: .top, endPoint: .bottom)
             }
 

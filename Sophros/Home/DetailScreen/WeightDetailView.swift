@@ -86,8 +86,7 @@ struct WeightDetailView: View {
 
             if showingGoalOnboarding {
                 FeatureOnboardingOverlay(
-                    icon: "scalemass.fill",
-                    tint: Colormanager.Sleep.periwinkle,
+					tint: Colormanager.Sleep.periwinkle, background: .red,
                     title: "Set your target weight",
                     message: "Choose a weight you want to work toward. You can update this at any time.",
                     actionTitle: "Save target",
