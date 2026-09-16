@@ -16,7 +16,7 @@ struct WorkoutActionButtonStyle: ButtonStyle {
             .foregroundStyle(
                 isPrimary ? .white : Colormanager.Workout.terracotta
             )
-            .padding(.vertical, 14)
+            .padding(.vertical)
             .background(
                 isPrimary
                     ? Colormanager.Workout.terracotta

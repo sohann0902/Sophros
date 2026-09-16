@@ -25,6 +25,24 @@ public class UserProfile: NSManagedObject {
             genderRaw = newValue.rawValue
         }
     }
+
+	var activityLevel: ActivityLevel {
+		get {
+			return ActivityLevel(rawValue: activityLevelRaw ?? "") ?? .sedentary
+		}
+		set {
+			activityLevelRaw = newValue.rawValue
+		}
+	}
+
+	var nutritionGoal: NutritionGoalType {
+		get {
+			return NutritionGoalType(rawValue: nutritionGoalRaw ?? "") ?? .maintain
+		}
+		set {
+			nutritionGoalRaw = newValue.rawValue
+		}
+	}
 }
 
 enum Gender: String, CaseIterable, Identifiable {

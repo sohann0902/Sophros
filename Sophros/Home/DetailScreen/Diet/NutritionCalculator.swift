@@ -17,6 +17,22 @@ struct NutritionCalculator {
 		profile: NutritionProfile,
 		context: NSManagedObjectContext
 	) -> NutritionGoal {
+		let targets = calculateTargets(profile: profile)
+
+		let nutritionGoal = NutritionGoal(context: context)
+		nutritionGoal.calorie = targets.calories
+		nutritionGoal.protein = targets.protein
+		nutritionGoal.carbs = targets.carbs
+		nutritionGoal.fat = targets.fat
+		nutritionGoal.fiber = targets.fiber
+		nutritionGoal.sugar = targets.sugarLimit
+
+		return nutritionGoal
+	}
+
+	/// Calculates a person's daily nutrition targets without creating Core Data
+	/// objects. This lets onboarding show the estimate before it is saved.
+	static func calculateTargets(profile: NutritionProfile) -> NutritionTargets {
 
 		// 1. Calculate BMR
 		let bmr = calculateBMR(
@@ -89,30 +105,14 @@ struct NutritionCalculator {
 			(calories * 0.10) / 4
 
 
-		// MARK: - Create Core Data Object
-
-		let nutritionGoal =
-			NutritionGoal(context: context)
-
-		nutritionGoal.calorie =
-			calories.rounded()
-
-		nutritionGoal.protein =
-			protein.rounded()
-
-		nutritionGoal.carbs =
-			carbs.rounded()
-
-		nutritionGoal.fat =
-			fat.rounded()
-
-		nutritionGoal.fiber =
-			fiber.rounded()
-
-		nutritionGoal.sugar =
-			sugarLimit.rounded()
-
-		return nutritionGoal
+		return NutritionTargets(
+			calories: calories.rounded(),
+			protein: protein.rounded(),
+			carbs: carbs.rounded(),
+			fat: fat.rounded(),
+			fiber: fiber.rounded(),
+			sugarLimit: sugarLimit.rounded()
+		)
 	}
 
 
@@ -176,6 +176,15 @@ struct NutritionProfile {
 	let weightKG: Double
 	let activityLevel: ActivityLevel
 	let goal: NutritionGoalType
+}
+
+struct NutritionTargets: Equatable {
+	let calories: Double
+	let protein: Double
+	let carbs: Double
+	let fat: Double
+	let fiber: Double
+	let sugarLimit: Double
 }
 
 
@@ -252,4 +261,3 @@ enum ActivityLevel: String, CaseIterable, Identifiable {
 		}
 	}
 }
-

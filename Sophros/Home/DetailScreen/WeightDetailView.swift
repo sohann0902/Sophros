@@ -64,21 +64,24 @@ struct WeightDetailView: View {
                 .pickerStyle(.segmented)
                 .symbolColorRenderingMode(.flat)
                 .tint(.white)
-                .colorMultiply(Colormanager.Sleep.lavender)
+				.colorMultiply(Colormanager.Calendar.green)
                 .padding(.horizontal, 24)
+					
+					Button {
+						showingLogWeight = true
+					} label: {
+						Text("Log weight")
+							.font(.title3.weight(.semibold))
+							.foregroundStyle(.white)
+							.padding()
+							.frame(maxWidth: .infinity)
+							.background(Colormanager.Calendar.green)
+							.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+					}
+					.buttonStyle(PressableButtonStyle())
+					.padding(.horizontal, 24)
 
                     goalCard
-
-                    Button {
-                        showingLogWeight = true
-                    } label: {
-                        Label("Log weight", systemImage: "plus")
-                            .font(.title3.weight(.semibold))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 19)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .padding(.horizontal, 24)
                 }
                 .padding(.top, 12)
                 .padding(.bottom, 32)
@@ -86,7 +89,7 @@ struct WeightDetailView: View {
 
             if showingGoalOnboarding {
                 FeatureOnboardingOverlay(
-					tint: Colormanager.Sleep.periwinkle, background: .red,
+					tint: Colormanager.Calendar.green, background: Colormanager.Calendar.green,
                     title: "Set your target weight",
                     message: "Choose a weight you want to work toward. You can update this at any time.",
                     actionTitle: "Save target",
@@ -132,7 +135,7 @@ struct WeightDetailView: View {
                 
                 Text("Current weight")
             }
-            .foregroundStyle(Colormanager.Sleep.periwinkle)
+            .foregroundStyle(Colormanager.Calendar.green)
 
             Spacer()
             
@@ -144,7 +147,7 @@ struct WeightDetailView: View {
     private var trendCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Your journey").font(.title2.bold())
-                .foregroundStyle(Colormanager.Sleep.lavender)
+                .foregroundStyle(Colormanager.Calendar.green)
             WeightTrendSection(range: selectedRange)
                 .id(selectedRange)
                 .frame(height: 230)
@@ -152,7 +155,7 @@ struct WeightDetailView: View {
         .padding(24)
         .background(
             LinearGradient(
-                colors: [Colormanager.Sleep.lavender.opacity(0.22), Colormanager.Sleep.lavender.opacity(0.18), Colormanager.Sleep.lavender.opacity(0.5)],
+                colors: [Colormanager.Calendar.green.opacity(0.22), Colormanager.Calendar.green.opacity(0.18), Colormanager.Calendar.green.opacity(0.5)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -200,11 +203,11 @@ struct WeightDetailView: View {
 
            
         }
-        .foregroundStyle(Colormanager.Sleep.lavender)
+        .foregroundStyle(Colormanager.Calendar.green)
         .padding(24)
         .background(
             LinearGradient(
-                colors: [Colormanager.Sleep.lavender.opacity(0.22), Colormanager.Sleep.lavender.opacity(0.18), Colormanager.Sleep.lavender.opacity(0.5)],
+                colors: [Colormanager.Calendar.green.opacity(0.22), Colormanager.Calendar.green.opacity(0.18), Colormanager.Calendar.green.opacity(0.5)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -240,7 +243,7 @@ struct WeightDetailView: View {
 
     private var validOnboardingGoal: Bool {
         guard let value = Double(onboardingGoalText) else { return false }
-        return (20...300).contains(value)
+        return value > 0
     }
 
     private func saveOnboardingGoal() {
@@ -390,12 +393,12 @@ struct WeightTrendChart: View {
             ZStack {
 
                 TrendLineShape(points: points, interval: interval, yDomain: yDomain)
-                    .stroke(Colormanager.Sleep.lavender, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+                    .stroke(Colormanager.Calendar.green, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
 
                 ForEach(points) { point in
                     ZStack {
                         Circle()
-                            .fill(Colormanager.Sleep.lavender)
+                            .fill(Colormanager.Calendar.green)
                             .frame(width: 9, height: 9)
                             .position(TrendGeometry.position(for: point, in: rect, interval: interval, yDomain: yDomain))
                     }
@@ -479,20 +482,20 @@ struct GoalJourney: View {
                         control2: CGPoint(x: width * 0.72, y: end.y)
                     )
                 }
-                .stroke(Colormanager.Sleep.lavender.opacity(0.65), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                .stroke(Colormanager.Calendar.green.opacity(0.65), style: StrokeStyle(lineWidth: 3, lineCap: .round))
 
                 Circle()
-                    .fill(Colormanager.Sleep.lavender.opacity(0.35))
+                    .fill(Colormanager.Calendar.green.opacity(0.35))
                     .frame(width: 11, height: 11)
                     .position(start)
 
                 Circle()
-                    .fill(Colormanager.Sleep.lavender)
-                    .frame(width: 14, height: 14)
+                    .fill(Colormanager.Calendar.green)
+                    .frame(width: 11, height: 11)
                     .position(current)
 
                 Image(systemName: "flag.fill")
-                    .foregroundStyle(Colormanager.Sleep.lavender)
+                    .foregroundStyle(Colormanager.Calendar.green)
                     .position(end)
             }
         }

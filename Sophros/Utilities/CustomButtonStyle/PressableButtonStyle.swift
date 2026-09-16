@@ -14,3 +14,16 @@ struct PressableButtonStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.3), value: configuration.isPressed)
     }
 }
+
+struct SelectableListCell: ButtonStyle {
+	func makeBody(configuration: Configuration) -> some View {
+		configuration.label
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.contentShape(Rectangle())
+			.background {
+				if configuration.isPressed {
+					Color.primary.opacity(0.12)
+				}
+			}
+	}
+}

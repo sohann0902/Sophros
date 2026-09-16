@@ -177,6 +177,66 @@ struct MeasurementStepView: View {
     }
 }
 
+// MARK: - Nutrition setup
+
+struct ActivityLevelStepView: View {
+    @Binding var activityLevel: ActivityLevel?
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(ActivityLevel.allCases) { option in
+                SelectionRow(
+                    title: option.title,
+                    isSelected: activityLevel == option
+                ) {
+                    activityLevel = option
+                }
+            }
+        }
+    }
+}
+
+struct NutritionGoalStepView: View {
+    @Binding var goal: NutritionGoalType?
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(NutritionGoalType.allCases) { option in
+                SelectionRow(title: option.title, isSelected: goal == option) {
+                    goal = option
+                }
+            }
+        }
+    }
+}
+
+private struct SelectionRow: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Text(title).font(.system(size: 18, weight: .semibold))
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .fontWeight(.bold)
+                }
+            }
+            .foregroundStyle(isSelected ? .white : Colormanager.Typography.primaryText)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSelected ? Colormanager.Accent.selected : Colormanager.secondaryBg)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - Shared field styling
 
 private struct OnboardingFieldStyle: ViewModifier {

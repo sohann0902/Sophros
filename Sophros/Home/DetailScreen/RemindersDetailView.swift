@@ -37,7 +37,7 @@ struct RemindersDetailView: View {
     @State private var reminderBeingEdited: Reminder?
     @State private var showingNewReminder = false
     @State private var editMode: EditMode = .inactive
-    @AppStorage("hasSeenRemindersOnboarding") private var hasSeenRemindersOnboarding = false
+    @AppStorage("showRemindersOnboarding") private var showRemindersOnboarding = true
 
     private var displayedReminders: [Reminder] {
         selectedList == .upcoming
@@ -60,7 +60,7 @@ struct RemindersDetailView: View {
                 .padding(.vertical, 6)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
-                .colorMultiply(Colormanager.Accent.button)
+				.colorMultiply(Colormanager.Reminder.periwinkle)
 
                 if displayedReminders.isEmpty {
                     emptyState
@@ -85,6 +85,7 @@ struct RemindersDetailView: View {
                                     delete(reminder)
                                 } label: {
                                     Label("Delete", systemImage: "trash")
+										.tint(Colormanager.Reminder.periwinkle)
                                 }
                             }
                         }
@@ -103,7 +104,7 @@ struct RemindersDetailView: View {
                     .font(.title2.weight(.bold))
                     .foregroundStyle(.white)
                     .frame(width: 58, height: 58)
-                    .background(Colormanager.Accent.button)
+                    .background(Colormanager.Reminder.periwinkle)
                     .clipShape(Circle())
                     .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
             }
@@ -111,14 +112,15 @@ struct RemindersDetailView: View {
             .padding(.trailing, 24)
             .padding(.bottom, 22)
 
-            if !hasSeenRemindersOnboarding {
+			
+			FadeOverlay(isPresented: $showRemindersOnboarding) {
                 FeatureOnboardingOverlay(
-					tint: Colormanager.Accent.button, background: .red,
+					tint: Colormanager.Reminder.softPurple, background: Colormanager.Reminder.periwinkle,
                     title: "Stay on top of what matters",
                     message: "Add one-off or repeating reminders for habits, appointments, and anything you do not want to forget.",
                     content: { EmptyView() }
                 ) {
-                    hasSeenRemindersOnboarding = true
+                    showRemindersOnboarding = false
                 }
             }
         }
@@ -232,7 +234,7 @@ private struct ReminderRow: View {
             Button(action: toggleCompletion) {
                 Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
-                    .foregroundStyle(isCompleted ? Colormanager.Accent.button : Colormanager.Typography.secondaryText)
+                    .foregroundStyle(isCompleted ? Colormanager.Reminder.periwinkle : Colormanager.Typography.secondaryText)
             }
             .buttonStyle(.borderless)
 

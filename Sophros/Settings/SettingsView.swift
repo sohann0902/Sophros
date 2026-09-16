@@ -22,21 +22,35 @@ struct SettingsView: View {
                     .font(.system(size: 32, weight: .heavy))
                     .foregroundStyle(Colormanager.Typography.primaryText)
 
-                // Dev aid: replay the onboarding flow from scratch.
-                Button("Reset onboarding", role: .destructive) {
-                    resetOnboarding()
+                Button("Reset app data", role: .destructive) {
+                    resetAppData()
                 }
                 .font(.system(size: 16, weight: .semibold))
             }
         }
     }
 
-    private func resetOnboarding() {
-        let request = NSFetchRequest<UserProfile>(entityName: "UserProfile")
-        if let profiles = try? context.fetch(request) {
-            profiles.forEach(context.delete)
-            try? context.save()
+    private func resetAppData() {
+        guard let entities = context.persistentStoreCoordinator?.managedObjectModel.entities else {
+            return
         }
-        hasCompletedOnboarding = false
+
+        do {
+            for entity in entities {
+                guard let entityName = entity.name else { continue }
+                let request = NSFetchRequest<NSManagedObject>(entityName: entityName)
+                let objects = try context.fetch(request)
+                objects.forEach(context.delete)
+            }
+
+            try context.save()
+
+            if let bundleIdentifier = Bundle.main.bundleIdentifier {
+                UserDefaults.standard.removePersistentDomain(forName: bundleIdentifier)
+            }
+            hasCompletedOnboarding = false
+        } catch {
+            print("Failed to reset app data: \(error)")
+        }
     }
 }

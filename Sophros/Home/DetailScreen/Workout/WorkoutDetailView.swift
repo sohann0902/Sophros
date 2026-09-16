@@ -22,6 +22,18 @@ struct WorkoutDetailView: View {
     )
     
     private var sessions: FetchedResults<WorkoutSession>
+	
+	@FetchRequest(
+		sortDescriptors: [
+			NSSortDescriptor(
+				keyPath: \WorkoutTemplate.createdAt,
+				ascending: false
+			)
+		],
+		animation: .default
+	)
+	
+	private var templates: FetchedResults<WorkoutTemplate>
 
     @State private var selectedWeek = Date()
     @State private var showingCreateWorkout = false
@@ -116,7 +128,7 @@ struct WorkoutDetailView: View {
     }
     
     @State private var showingCalendar = false
-    @AppStorage("hasSeenWorkoutOnboarding") private var hasSeenWorkoutOnboarding = false
+	@State private var showOnboarding = false
 
     var body: some View {
         ZStack {
@@ -130,15 +142,18 @@ struct WorkoutDetailView: View {
                     } else {
                         sessionList
                     }
-
-                    actionButtons
+					
+					Color.clear
+						.frame(height: 76)
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
                 }
                 .padding()
                 .padding(.bottom, 24)
             }
             .background(Colormanager.baseBackground.ignoresSafeArea())
 
-            if showingCalendar {
+			FadeOverlay(isPresented: $showingCalendar) {
                 Color.black.opacity(0.25)
                     .ignoresSafeArea()
                     .onTapGesture {
@@ -149,27 +164,54 @@ struct WorkoutDetailView: View {
                     selectedWeek: $selectedWeek,
                     isPresented: $showingCalendar,
                     calendar: calendar,
-					background: Colormanager.Water.lightBlue,
-					tint: Colormanager.Water.skyBlue
+					background: Colormanager.Workout.sand,
+					tint: Colormanager.Workout.sand
                 )
                 .padding(20)
                 .transition(.opacity)
             }
 
-            if !hasSeenWorkoutOnboarding {
+            FadeOverlay(isPresented: $showOnboarding) {//
                 FeatureOnboardingOverlay(
-					tint: Colormanager.Workout.terracotta, background: .red,
+					tint: Colormanager.Workout.clay, background: Colormanager.Workout.terracotta,
                     title: "Make workouts repeatable",
                     message: "Create templates for the routines you love, then log them each day without rebuilding every exercise.",
                     content: { EmptyView() }
                 ) {
-                    hasSeenWorkoutOnboarding = true
+					showOnboarding = false
                 }
             }
+			
+			VStack {
+				Spacer()
+				
+				Button {
+					showingLogWorkout = true
+				} label: {
+					Label("Log Workout", systemImage: "checkmark")
+						.frame(maxWidth: .infinity)
+				}
+				.buttonStyle(WorkoutActionButtonStyle(isPrimary: true))
+				.padding(.horizontal)
+				.padding(.bottom, 12)
+			}
         }
+		.onAppear(perform: {
+			showOnboarding = true
+		})
         .animation(.easeInOut(duration: 0.2), value: showingCalendar)
         .navigationTitle("Workout")
         .navigationBarTitleDisplayMode(.inline)
+		.toolbar(content: {
+			ToolbarItem(placement: .topBarTrailing) {
+				Button {
+					showingCreateWorkout = true
+				} label: {
+					Image(systemName: "bookmark.fill")
+				}
+				.foregroundStyle(Colormanager.Workout.terracotta)
+			}
+		})
         .sheet(isPresented: $showingCreateWorkout) {
             CreateWorkoutView()
                 .interactiveDismissDisabled()
@@ -285,34 +327,16 @@ struct WorkoutDetailView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
         )
     }
-
-    private var actionButtons: some View {
-        HStack(spacing: 12) {
-            Button {
-                showingCreateWorkout = true
-            } label: {
-                Label("Create Workout", systemImage: "plus")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(WorkoutActionButtonStyle(isPrimary: false))
-
-            Button {
-                showingLogWorkout = true
-            } label: {
-                Label("Log Workout", systemImage: "checkmark")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(WorkoutActionButtonStyle(isPrimary: true))
-        }
-    }
 }
 
 #Preview {
-    WorkoutDetailView(card: DashboardCard.cards[1])
-        .environment(
-            \.managedObjectContext,
-            PersistenceController.preview.container.viewContext
-        )
+	NavigationStack {
+		WorkoutDetailView(card: DashboardCard.cards[1])
+			.environment(
+				\.managedObjectContext,
+				 PersistenceController.preview.container.viewContext
+			)
+	}
 }
 
 private struct WorkoutSessionCard: View {

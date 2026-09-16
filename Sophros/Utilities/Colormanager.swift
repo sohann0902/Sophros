@@ -45,10 +45,10 @@ struct Colormanager {
         static let mauve: Color = Color("menstrualCycleMauve")
     }
 
-    struct Sleep {
-        static let lavender: Color = Color("sleepLavender")
-        static let periwinkle: Color = Color("sleepPeriwinkle")
-        static let softPurple: Color = Color("sleepSoftPurple")
+    struct Reminder {
+        static let lavender: Color = Color("reminderLavender")
+        static let periwinkle: Color = Color("reminderPeriwinkle")
+        static let softPurple: Color = Color("reminderSoftPurple")
     }
 
     struct Notes {

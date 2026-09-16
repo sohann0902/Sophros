@@ -156,6 +156,10 @@ struct OnboardingView: View {
             MeasurementStepView(value: $draft.heightCm, unit: "cm", placeholder: "170")
         case .weight:
             MeasurementStepView(value: $draft.weightKg, unit: "kg", placeholder: "65")
+        case .activity:
+            ActivityLevelStepView(activityLevel: $draft.activityLevel)
+        case .nutritionGoal:
+            NutritionGoalStepView(goal: $draft.nutritionGoal)
         }
     }
 
@@ -207,6 +211,8 @@ struct OnboardingView: View {
         profile.age = Int16(draft.age ?? 0)
         profile.height = draft.heightCm ?? 0
         profile.weight = draft.weightKg ?? 0
+        profile.activityLevel = draft.activityLevel ?? .sedentary
+        profile.nutritionGoal = draft.nutritionGoal ?? .maintain
         profile.userType = "free"
 
         // The profile records the initial answer, while WeightEntry gives the

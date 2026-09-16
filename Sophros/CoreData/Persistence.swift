@@ -200,7 +200,7 @@ struct PersistenceController {
         m1.createdAt = .now
         m1.id = UUID()
         m1.mealType = .breakfast
-        m1.kindRaw = "log"
+		m1.kind = .template
         m1.occuredAt = .now
         
         let m2 = MealLog(context: viewContext)
@@ -208,7 +208,7 @@ struct PersistenceController {
         m2.createdAt = .now
         m2.id = UUID()
         m2.mealType = .lunch
-        m2.kindRaw = "log"
+		m2.kind = .template
         m2.occuredAt = .now
         
         let m3 = MealLog(context: viewContext)
@@ -216,7 +216,7 @@ struct PersistenceController {
         m3.createdAt = .now
         m3.id = UUID()
         m3.mealType = .dinner
-        m3.kindRaw = "log"
+		m3.kind = .template
         m3.occuredAt = .now
         
         let m4 = MealLog(context: viewContext)
@@ -224,7 +224,7 @@ struct PersistenceController {
         m4.createdAt = .now
         m4.id = UUID()
         m4.mealType = .snack
-        m4.kindRaw = "log"
+		m4.kind = .template
         m4.occuredAt = .now
         
         let weightSamples: [(dayOffset: Int, weight: Double)] = [

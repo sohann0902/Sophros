@@ -16,6 +16,8 @@ enum OnboardingStep: Int, CaseIterable {
     case age
     case height
     case weight
+    case activity
+    case nutritionGoal
 
     /// Steps that make up the collect-info wizard (everything after the welcome screen).
     static var inputSteps: [OnboardingStep] {
@@ -40,6 +42,8 @@ enum OnboardingStep: Int, CaseIterable {
         case .age: return "How old are you?"
         case .height: return "How tall are you?"
         case .weight: return "What's your weight?"
+        case .activity: return "How active are you?"
+        case .nutritionGoal: return "What's your nutrition goal?"
         }
     }
 
@@ -51,6 +55,8 @@ enum OnboardingStep: Int, CaseIterable {
         case .age: return "Your age helps us set healthy targets."
         case .height: return "Measured in centimeters."
         case .weight: return "Measured in kilograms."
+        case .activity: return "This helps us estimate your daily energy needs."
+        case .nutritionGoal: return "We'll use this to personalize your nutrition targets."
         }
     }
 
@@ -71,6 +77,8 @@ struct OnboardingDraft {
     var age: Int? = nil
     var heightCm: Double? = nil
     var weightKg: Double? = nil
+    var activityLevel: ActivityLevel? = nil
+    var nutritionGoal: NutritionGoalType? = nil
 
     /// Whether the current step has a valid value, used to gate the Continue button.
     func isValid(for step: OnboardingStep) -> Bool {
@@ -89,6 +97,10 @@ struct OnboardingDraft {
         case .weight:
             guard let _ = weightKg else { return false }
             return true
+        case .activity:
+            return activityLevel != nil
+        case .nutritionGoal:
+            return nutritionGoal != nil
         }
     }
 }

@@ -27,7 +27,7 @@ struct DashboardCard: Identifiable {
               title: "Water", value: "1.8 / 2.5 L",
               subtitle: "72%", progress: 0.72),
         
-            .init(type: .workout, icon: "figure.strengthtraining.traditional", iconColor: .green,
+            .init(type: .workout, icon: "figure.strengthtraining.traditional", iconColor: Colormanager.Workout.terracotta,
                   title: "Workout", value: "Push Day",
                   subtitle: "5 Exercises"),
         
@@ -35,13 +35,13 @@ struct DashboardCard: Identifiable {
                   title: "Diet", value: "1,720 / 2,000",
                   subtitle: "Calories"),
         
-            .init(type: .reminders, icon: "calendar", iconColor: .orange,
+            .init(type: .reminders, icon: "calendar", iconColor: Colormanager.Reminder.periwinkle,
                   title: "Reminders", value: "3",
                   subtitle: "Upcoming")
     ]
     
     static let otherCards : [DashboardCard] = [
-        .init(type: .weight, icon: "scalemass.fill", iconColor: .orange,
+        .init(type: .weight, icon: "scalemass.fill", iconColor: Colormanager.Calendar.green,
               title: "Weight", value: "58kg",
               subtitle: ""),
         

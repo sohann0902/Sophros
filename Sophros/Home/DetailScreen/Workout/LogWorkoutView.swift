@@ -121,7 +121,7 @@ struct LogWorkoutView: View {
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)
-                                .background(Colormanager.Accent.button)
+                                .background(Colormanager.Workout.terracotta)
                                 .clipShape(
                                     RoundedRectangle(
                                         cornerRadius: 18,

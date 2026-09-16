@@ -24,25 +24,41 @@ struct DietDetailView: View {
 	
 	@FetchRequest(sortDescriptors: [], animation: .default)
 	private var nutritionGoals: FetchedResults<NutritionGoal>
+
+	@FetchRequest(
+		sortDescriptors: [NSSortDescriptor(keyPath: \UserProfile.createdAt, ascending: true)],
+		animation: .default
+	)
+	private var userProfiles: FetchedResults<UserProfile>
 	
 	@State private var selectedDate = Date()
 	@State private var showingAddMeal = false
+	@State private var showingSaveMeal = false
 	@State private var showingCalendar = false
 	@State private var showingGoalOnboarding = false
-	@State private var calorieInput = "2000"
-	@State private var proteinInput = "120"
-	@State private var fatInput = "70"
-	@State private var carbsInput = "250"
-	@State private var fiberInput = "30"
-	@State private var sugarInput = "35"
 	
 	private var nutritionGoal: NutritionGoal? { nutritionGoals.first }
-	private var calorieTarget: Double { nutritionGoal?.calorie ?? 2_000 }
-	private var proteinTarget: Double { nutritionGoal?.protein ?? 120 }
-	private var carbsTarget: Double { nutritionGoal?.carbs ?? 250 }
-	private var fatTarget: Double { nutritionGoal?.fat ?? 70 }
-	private var fiberTarget: Double { nutritionGoal?.fiber ?? 30 }
-	private var sugarLimit: Double { nutritionGoal?.sugar ?? 35 }
+	private var userProfile: UserProfile? { userProfiles.first }
+
+	private var calculatedNutritionProfile: NutritionProfile? {
+		guard let userProfile, userProfile.age > 0, userProfile.height > 0, userProfile.weight > 0 else {
+			return nil
+		}
+
+		return NutritionProfile(
+			gender: userProfile.gender,
+			age: Int(userProfile.age),
+			heightCM: userProfile.height,
+			weightKG: userProfile.weight,
+			activityLevel: userProfile.activityLevel,
+			goal: userProfile.nutritionGoal
+		)
+	}
+
+	private var calculatedTargets: NutritionTargets? {
+		guard let calculatedNutritionProfile else { return nil }
+		return NutritionCalculator.calculateTargets(profile: calculatedNutritionProfile)
+	}
 	
 	private var calendar: Calendar {
 		Calendar.current
@@ -95,37 +111,39 @@ struct DietDetailView: View {
 		allItems.reduce(0) { $0 + $1.sugar }
 	}
 	
-	private var calorieProgress: Double {
-		min(calories / calorieTarget, 1)
-	}
-	
 	var body: some View {
 		ZStack {
 			Colormanager.baseBackground
 				.ignoresSafeArea()
-			
+
 			List {
 				datePicker
 					.listRowBackground(Color.clear)
 					.listRowSeparator(.hidden)
 				
-				NutritionSummaryCard(
-					calories: calories,
-					calorieTarget: calorieTarget,
-					protein: protein,
-					proteinTarget: proteinTarget,
-					carbs: carbs,
-					carbsTarget: carbsTarget,
-					fat: fat,
-					fatTarget: fatTarget,
-					progress: calorieProgress,
-					fiber: fiber,
-					fiberTarget: fiberTarget,
-					sugar: sugar,
-					sugarLimit: sugarLimit
-				)
-				.listRowBackground(Color.clear)
-				.listRowSeparator(.hidden)
+				if let nutritionGoal {
+					NutritionSummaryCard(
+						calories: calories,
+						calorieTarget: nutritionGoal.calorie,
+						protein: protein,
+						proteinTarget: nutritionGoal.protein,
+						carbs: carbs,
+						carbsTarget: nutritionGoal.carbs,
+						fat: fat,
+						fatTarget: nutritionGoal.fat,
+						progress: min(calories / max(nutritionGoal.calorie, 1), 1),
+						fiber: fiber,
+						fiberTarget: nutritionGoal.fiber,
+						sugar: sugar,
+						sugarLimit: nutritionGoal.sugar
+					)
+					.listRowBackground(Color.clear)
+					.listRowSeparator(.hidden)
+				} else {
+					nutritionTargetUnavailable
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
+				}
 				
 				if todayLogs.isEmpty {
 					emptyState
@@ -176,53 +194,62 @@ struct DietDetailView: View {
 					}
 				
 				CalendarOverlay(
-					selectedWeek: $selectedDate,
-					isPresented: $showingCalendar,
-					calendar: calendar,
-					background: Colormanager.Water.lightBlue,
-					tint: Colormanager.Water.skyBlue
+					selectedWeek: .constant(.now),
+					isPresented: .constant(true),
+					calendar: Calendar.current,
+					background: Colormanager.Accent.button,
+					tint: Color.black
 				)
 				.padding(20)
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 				.padding(.top, 44)
 			}
-			
-			FadeOverlay(isPresented: $showingGoalOnboarding)  {
-				DietOnboardingView(calorie: $calorieInput, protein: $proteinInput, carbs: $carbsInput, fat: $fatInput) {
 
-						showingGoalOnboarding = false
+			FadeOverlay(isPresented: $showingGoalOnboarding) {
+				if let calculatedTargets {
+					DietOnboardingView(targets: calculatedTargets, action: saveNutritionGoal)
 				}
 			}
+
 		}
 		.navigationTitle("Diet")
 		.navigationBarTitleDisplayMode(.inline)
 		.animation(.easeInOut(duration: 0.2), value: showingCalendar)
 		.animation(.easeInOut(duration: 0.4), value: showingGoalOnboarding)
-		.sheet(isPresented: $showingAddMeal) {
-			AddMealView(mealDate: selectedDate)
+		.navigationDestination(isPresented: $showingAddMeal) {
+			LogMealView(mealDate: selectedDate)
 		}
-		.onAppear { showingGoalOnboarding = true }
+		.sheet(isPresented: $showingSaveMeal) {
+			SavedMealsView { _ in
+				
+			}
+		}
+		.onAppear {
+			showingGoalOnboarding = nutritionGoals.isEmpty && calculatedNutritionProfile != nil
+		}
+		.toolbar(content: {
+			ToolbarItem(placement: .topBarTrailing) {
+				Button {
+					showingSaveMeal = true
+				} label: {
+					Image(systemName: "bookmark.fill")
+				}
+				.foregroundStyle(Colormanager.Accent.button)
+			}
+		})
 	}
-	
-	private var validNutritionInputs: Bool {
-		let values = [calorieInput, proteinInput, fatInput, carbsInput, fiberInput, sugarInput]
-		return values.allSatisfy { (Double($0) ?? 0) > 0 }
-	}
-	
+
 	private func saveNutritionGoal() {
-		guard validNutritionInputs,
-			  let calorie = Double(calorieInput), let protein = Double(proteinInput),
-			  let fat = Double(fatInput), let carbs = Double(carbsInput),
-			  let fiber = Double(fiberInput), let sugar = Double(sugarInput) else { return }
-		let goal = NutritionGoal(context: viewContext)
-		goal.calorie = calorie
-		goal.protein = protein
-		goal.fat = fat
-		goal.carbs = carbs
-		goal.fiber = fiber
-		goal.sugar = sugar
-		try? viewContext.save()
-		showingGoalOnboarding = false
+		guard let calculatedNutritionProfile else { return }
+
+		let _ = NutritionCalculator.createGoal(profile: calculatedNutritionProfile, context: viewContext)
+
+		do {
+			try viewContext.save()
+			showingGoalOnboarding = false
+		} catch {
+			print("Failed to save nutrition target: \(error)")
+		}
 	}
 	
 	private var datePicker: some View {
@@ -296,6 +323,28 @@ struct DietDetailView: View {
 		.clipShape(
 			RoundedRectangle(cornerRadius: 20, style: .continuous)
 		)
+	}
+
+	private var nutritionTargetUnavailable: some View {
+		VStack(spacing: 10) {
+			Image(systemName: "chart.bar.doc.horizontal")
+				.font(.title2)
+				.foregroundStyle(Colormanager.Diet.apricot)
+
+			Text("Nutrition targets unavailable")
+				.font(.headline)
+				.foregroundStyle(Colormanager.Typography.primaryText)
+
+			Text("Complete onboarding to calculate your personalized daily targets.")
+				.font(.subheadline)
+				.multilineTextAlignment(.center)
+				.foregroundStyle(Colormanager.Typography.secondaryText)
+		}
+		.frame(maxWidth: .infinity)
+		.padding(.vertical, 32)
+		.padding(.horizontal)
+		.background(Colormanager.card)
+		.clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
 	}
 	
 	private func delete(_ meal: MealLog) {
@@ -563,73 +612,73 @@ private struct MealLogRow: View {
 
 
 #Preview {
-	DietDetailView(card: DashboardCard.cards[2])
-		.environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+//	DietDetailView(card: DashboardCard.cards[2])
+//		.environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+	
+	CalendarOverlay(
+		selectedWeek: .constant(.now),
+		isPresented: .constant(true),
+		calendar: Calendar.current,
+		background: Colormanager.Accent.button.opacity(0.5),
+		tint: Color.black
+	)
+	.padding(20)
+	.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+	.padding(.top, 44)
 }
 
-
 struct DietOnboardingView: View {
-	@Binding var calorie: String
-	@Binding var protein: String
-	@Binding var carbs: String
-	@Binding var fat: String
+	let targets: NutritionTargets
 	var action: () -> Void
 
 	var body: some View {
 		ZStack {
 			Colormanager.Diet.cream.ignoresSafeArea()
-			
+
 			VStack {
 				Text("")
-				
+
 				Text("We have estimated target nutrients for you to make your meal summary useful from day one. You can edit them anytime in settings.")
 					.multilineTextAlignment(.center)
 					.font(.system(.headline))
-				
+
 				Spacer()
 				Spacer()
-				
+
 				HStack {
-					Text("\(calorie) kcal")
+					Text("\(targets.calories, format: .number.precision(.fractionLength(0))) kcal")
 						.font(.largeTitle)
 						.fontWeight(.heavy)
 						.foregroundStyle(Colormanager.Accent.button)
 				}
-				
+
 				Text("Calories")
-				
+
 				Spacer()
 				Spacer()
-				
-				
-				HStack(spacing: 50){
-					
-					MacroRingView(title: "Protein", value: protein)
-					
-					MacroRingView(title: "Carbs", value: carbs)
-					
-					MacroRingView(title: "Fat", value: fat)
-					
+
+				HStack(spacing: 50) {
+					MacroRingView(title: "Protein", value: targets.protein)
+					MacroRingView(title: "Carbs", value: targets.carbs)
+					MacroRingView(title: "Fat", value: targets.fat)
 				}
 				.padding(.horizontal, 24)
-				
+
 				Spacer()
 				Spacer()
-				
+
 				ZStack {
 					Circle()
 						.fill(Colormanager.Diet.softPeach.opacity(0.6))
 						.blur(radius: 50)
 						.ignoresSafeArea()
-					
+
 					Image("Diet-onboard")
 						.resizable()
 						.scaledToFit()
 				}
-				
-				Button {
-					action()
-				} label: {
+
+				Button(action: action) {
 					Text("Save")
 						.font(.system(size: 17, weight: .bold))
 						.foregroundStyle(.white)
@@ -637,8 +686,6 @@ struct DietOnboardingView: View {
 						.padding(.vertical, 15)
 						.background(Colormanager.Accent.button, in: RoundedRectangle(cornerRadius: 15))
 				}
-				
-				
 			}
 			.padding()
 		}
@@ -646,27 +693,63 @@ struct DietOnboardingView: View {
 	}
 }
 
-#Preview {
-	DietOnboardingView(calorie: .constant("2000"), protein: .constant("120"), carbs: .constant("250"), fat: .constant("40")) {
-		
+struct MacroRingView: View {
+	let title: String
+	let value: Double
+
+	var body: some View {
+		VStack {
+			ZStack {
+				Circle().stroke(Colormanager.Accent.button, lineWidth: 2)
+				Text("\(value, format: .number.precision(.fractionLength(0))) g")
+			}
+			Text(title)
+		}
 	}
 }
 
-
-struct MacroRingView: View {
-	let title: String
-	let value: String
+struct ListSample: View {
+	
+	var string = ["abc","efg", "hij", "klm"]
+	
 	var body: some View {
-		
-		VStack {
-			ZStack {
-				Circle()
-					.stroke(Colormanager.Accent.button, lineWidth: 2)
-				
-				Text("\(value) g")
+		List {
+			Section {
+				ForEach(string, id: \.self) { str in
+					VStack {
+						Image(systemName: "checkmark")
+						
+						Text(str)
+					}
+				}
+				.listRowSeparator(.hidden)
+				.listRowBackground(Color.clear)
+			} header: {
+				Text("okay")
 			}
 			
-			Text(title)
+			Section {
+				ForEach(string, id: \.self) { str in
+					VStack {
+						Image(systemName: "checkmark")
+						
+						Text(str)
+					}
+				}
+			} header: {
+				Text("okay 2")
+			}
+			
 		}
+	}
+}
+//
+#Preview {
+	NavigationStack {
+		ZStack {
+			ListSample()
+		}
+		.navigationTitle("abc")
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }

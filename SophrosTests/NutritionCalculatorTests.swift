@@ -19,5 +19,9 @@ final class NutritionCalculatorTests: XCTestCase {
 		let goal = NutritionCalculator.createGoal(profile: profile, context: context)
 		
 		XCTAssertNotNil(goal)
+		XCTAssertEqual(goal.calorie, 2872)
+		XCTAssertEqual(goal.protein, 99)
+		XCTAssertEqual(goal.carbs, 520)
+		XCTAssertEqual(goal.fat, 44)
 	}
 }
