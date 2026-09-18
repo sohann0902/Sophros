@@ -15,6 +15,7 @@ struct FeatureOnboardingOverlay<Content: View>: View {
     let content: Content
     let action: () -> Void
 	let background: Color
+	@Environment(\.dismiss) var dismiss
 
     init(
         tint: Color,
@@ -112,4 +113,93 @@ struct OnboardingNumericField: View {
         .padding(14)
 		.background(.black.opacity(0.05), in: RoundedRectangle(cornerRadius: 13))
     }
+}
+
+
+struct LogWeightView<Content: View>: View {
+	let tint: Color
+	let title: String
+	let message: String
+	let actionTitle: String
+	let actionEnabled: Bool
+	let content: Content
+	let action: () -> Void
+	let background: Color
+	@Binding var showing: Bool
+
+	init(
+		tint: Color,
+		background: Color,
+		title: String,
+		message: String,
+		actionTitle: String = "Continue",
+		actionEnabled: Bool = true,
+		@ViewBuilder content: () -> Content,
+		action: @escaping () -> Void,
+		showing: Binding<Bool>
+	) {
+		self.tint = tint
+		self.background = background
+		self.title = title
+		self.message = message
+		self.actionTitle = actionTitle
+		self.actionEnabled = actionEnabled
+		self.content = content()
+		self.action = action
+		self._showing = showing
+	}
+
+	var body: some View {
+		ZStack {
+			Color.black.opacity(0.52)
+				.ignoresSafeArea()
+				.onTapGesture {
+					showing = false
+				}
+
+			VStack(alignment: .leading, spacing: 18) {
+				
+				if !title.isEmpty {
+					Text(title)
+						.font(.system(size: 22, weight: .heavy))
+						.foregroundStyle(Colormanager.Typography.primaryText)
+				}
+
+				if !message.isEmpty {
+					Text(message)
+						.font(.system(size: 16, weight: .medium))
+						.foregroundStyle(Colormanager.Typography.secondaryText)
+				}
+
+				content
+
+				Button(action: action) {
+					Text(actionTitle)
+						.font(.system(size: 17, weight: .bold))
+						.foregroundStyle(.white)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 15)
+						.background(background, in: RoundedRectangle(cornerRadius: 15))
+				}
+				.disabled(!actionEnabled)
+				.opacity(actionEnabled ? 1 : 0.45)
+			}
+			.padding(24)
+			.background(
+				ZStack {
+					Colormanager.card
+					LinearGradient(colors: [
+						tint.opacity(0.2),
+						tint.opacity(0.1),
+						tint.opacity(0.2),
+						.clear
+					], startPoint: .top, endPoint: .bottom)
+				})
+			.clipShape(
+				RoundedRectangle(cornerRadius: 28, style: .continuous)
+			)
+			.padding(24)
+		}
+		.accessibilityAddTraits(.isModal)
+	}
 }

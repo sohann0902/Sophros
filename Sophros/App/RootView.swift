@@ -18,14 +18,14 @@ struct RootView: View {
 
     var body: some View {
         ZStack {
-//            if hasCompletedOnboarding {
+            if hasCompletedOnboarding {
                 MainTabView()
                     .transition(.opacity)
-//            } else {
-//                OnboardingView(shouldAnimateWelcome: isLaunchContentVisible)
-//                    .transition(.opacity)
-//            }
-//
+            } else {
+                OnboardingView(shouldAnimateWelcome: isLaunchContentVisible)
+                    .transition(.opacity)
+            }
+
             if showSplash {
                 Splashscreen {
                     dismissSplash()

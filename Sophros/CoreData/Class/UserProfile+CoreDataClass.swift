@@ -14,7 +14,13 @@ public typealias UserProfileCoreDataClassSet = NSSet
 @objc(UserProfile)
 public class UserProfile: NSManagedObject {
     var name : String {
-        return displayName ?? ""
+		
+		get {
+			return displayName ?? ""
+		}
+		set {
+			displayName = newValue
+		}
     }
 
     var gender: Gender {

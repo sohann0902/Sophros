@@ -8,12 +8,12 @@
 
 import SwiftUI
 
-enum DashboardCardType {
+enum DashboardCardType: Hashable {
     case water, diet, workout, reminders, cycle, weight
 }
 
 struct DashboardCard: Identifiable {
-    let id = UUID()
+    var id: DashboardCardType { type }
     let type: DashboardCardType
     let icon: String
     let iconColor: Color
@@ -51,4 +51,3 @@ struct DashboardCard: Identifiable {
         
     ]
 }
-

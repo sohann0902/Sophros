@@ -227,16 +227,6 @@ struct DietDetailView: View {
 		.onAppear {
 			showingGoalOnboarding = nutritionGoals.isEmpty && calculatedNutritionProfile != nil
 		}
-		.toolbar(content: {
-			ToolbarItem(placement: .topBarTrailing) {
-				Button {
-					showingSaveMeal = true
-				} label: {
-					Image(systemName: "bookmark.fill")
-				}
-				.foregroundStyle(Colormanager.Accent.button)
-			}
-		})
 	}
 
 	private func saveNutritionGoal() {

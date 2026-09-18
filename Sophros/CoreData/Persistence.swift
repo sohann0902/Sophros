@@ -294,6 +294,25 @@ struct PersistenceController {
             symptom.updatedAt = .now
             symptom.log = todayCycleLog
         }
+		
+		let profile = UserProfile(context: viewContext)
+		profile.age = 24
+		profile.gender = .male
+		profile.name = "Sohan"
+		profile.activityLevel = .veryActive
+		profile.nutritionGoal = .gain
+		profile.height = 169
+		profile.weight = 55
+		profile.userType = "pro"
+		profile.id = UUID()
+		
+		let ngoal = NutritionGoal(context: viewContext)
+		ngoal.calorie = 2000
+		ngoal.carbs = 250
+		ngoal.fat = 40
+		ngoal.fiber = 40
+		ngoal.protein = 120
+		ngoal.sugar = 30
 
         do {
             try viewContext.save()

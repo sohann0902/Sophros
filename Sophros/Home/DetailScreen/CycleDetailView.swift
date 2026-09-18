@@ -351,7 +351,7 @@ struct CycleDetailView: View {
     }
 
     private var subtitleColor: Color {
-        selectedStatus.isFertileWindow ? Colormanager.MenstrualCycle.mauve : Colormanager.MenstrualCycle.dustyRose
+        selectedStatus.isFertileWindow ? Colormanager.Water.skyBlue : Colormanager.MenstrualCycle.dustyRose
     }
 
     private func performCycleMutation(_ mutation: () throws -> Void) {
@@ -592,7 +592,7 @@ private struct DateCarouselCell: View {
                     .overlay {
                         if isSelected {
                             Circle()
-                                .stroke(Colormanager.MenstrualCycle.dustyRose, lineWidth: 2)
+								.stroke(status.isFertileWindow ? Colormanager.Water.skyBlue : Colormanager.MenstrualCycle.dustyRose, lineWidth: 2)
                                 .frame(width: 50, height: 50)
                         }
                     }
@@ -607,7 +607,7 @@ private struct DateCarouselCell: View {
         switch status.periodState {
         case .actual: Colormanager.MenstrualCycle.dustyRose
         case .predicted: Colormanager.MenstrualCycle.dustyRose.opacity(0.32)
-        case .none: status.isFertileWindow ? Colormanager.MenstrualCycle.mauve.opacity(0.22) : Color.clear
+		case .none: status.isFertileWindow ? Colormanager.Water.skyBlue.opacity(0.32) : Color.clear
         }
     }
 }

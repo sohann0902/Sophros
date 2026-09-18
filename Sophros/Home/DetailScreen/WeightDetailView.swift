@@ -86,40 +86,52 @@ struct WeightDetailView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 32)
             }
-
-            if showingGoalOnboarding {
-                FeatureOnboardingOverlay(
+			
+			FadeOverlay(isPresented: $showingGoalOnboarding) {
+				FeatureOnboardingOverlay(
 					tint: Colormanager.Calendar.green, background: Colormanager.Calendar.green,
-                    title: "Set your target weight",
-                    message: "Choose a weight you want to work toward. You can update this at any time.",
-                    actionTitle: "Save target",
-                    actionEnabled: validOnboardingGoal,
-                    content: {
-                        OnboardingNumericField(title: "Target weight", unit: "kg", placeholder: "65", value: $onboardingGoalText)
-                    },
-                    action: saveOnboardingGoal
-                )
-            }
+					title: "Set your target weight",
+					message: "Choose a weight you want to work toward. You can update this at any time.",
+					actionTitle: "Save target",
+					actionEnabled: validOnboardingGoal,
+					content: {
+						OnboardingNumericField(title: "Target weight", unit: "kg", placeholder: "65", value: $onboardingGoalText)
+					},
+					action: saveOnboardingGoal
+				)
+			}
+			
+			FadeOverlay(isPresented: $showingLogWeight) {
+				LogWeightView(
+					tint: Colormanager.Calendar.green, background: Colormanager.Calendar.green,
+					title: "",
+					message: "",
+					actionTitle: "Log Weight",
+					actionEnabled: !weightText.isEmpty && (Double(weightText) ?? 0) > 0,
+					content: {
+						OnboardingNumericField(title: "Weight", unit: "kg", placeholder: "50", value: $weightText)
+					},
+					action: saveWeight, showing: $showingLogWeight
+				)
+			}
+			
+			FadeOverlay(isPresented: $showingGoalEditor) {
+				LogWeightView(
+					tint: Colormanager.Calendar.green, background: Colormanager.Calendar.green,
+					title: "Set goal",
+					message: "Choose the weight you want to work toward.",
+					actionTitle: "Save target",
+					actionEnabled: !goalText.isEmpty && (Double(goalText) ?? 0) > 0,
+					content: {
+						OnboardingNumericField(title: "Weight in kg", unit: "kg", placeholder: "50", value: $goalText)
+					},
+					action: setGoal, showing: $showingGoalEditor
+				)
+			}
         }
         .navigationTitle("Weight")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { showingGoalOnboarding = weightGoals.isEmpty }
-        .alert("Log weight", isPresented: $showingLogWeight) {
-            TextField("Weight in kg", text: $weightText)
-                .keyboardType(.decimalPad)
-            Button("Cancel", role: .cancel) { weightText = "" }
-            Button("Save") { saveWeight() }
-        } message: {
-            Text("Enter your current weight in kilograms.")
-        }
-        .alert("Set goal", isPresented: $showingGoalEditor) {
-            TextField("Goal weight in kg", text: $goalText)
-                .keyboardType(.decimalPad)
-            Button("Cancel", role: .cancel) { goalText = "" }
-            Button("Save") { setGoal() }
-        } message: {
-            Text("Choose the weight you want to work toward.")
-        }
     }
 
     private var currentWeightHero: some View {
@@ -229,7 +241,7 @@ struct WeightDetailView: View {
 
     private func setGoal() {
         guard let value = Double(goalText), value > 0 else { return }
-
+		showingGoalEditor = false
         let goal = weightGoals.first ?? WeightGoal(context: context)
         if goal.id == nil {
             goal.id = UUID()

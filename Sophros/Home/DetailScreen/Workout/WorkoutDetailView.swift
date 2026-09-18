@@ -170,17 +170,6 @@ struct WorkoutDetailView: View {
                 .padding(20)
                 .transition(.opacity)
             }
-
-            FadeOverlay(isPresented: $showOnboarding) {//
-                FeatureOnboardingOverlay(
-					tint: Colormanager.Workout.clay, background: Colormanager.Workout.terracotta,
-                    title: "Make workouts repeatable",
-                    message: "Create templates for the routines you love, then log them each day without rebuilding every exercise.",
-                    content: { EmptyView() }
-                ) {
-					showOnboarding = false
-                }
-            }
 			
 			VStack {
 				Spacer()
@@ -195,6 +184,18 @@ struct WorkoutDetailView: View {
 				.padding(.horizontal)
 				.padding(.bottom, 12)
 			}
+
+            FadeOverlay(isPresented: $showOnboarding) {//
+                FeatureOnboardingOverlay(
+					tint: Colormanager.Workout.clay, background: Colormanager.Workout.terracotta,
+                    title: "Make workouts repeatable",
+                    message: "Create templates for the routines you love, then log them each day without rebuilding every exercise.",
+                    content: { EmptyView() }
+                ) {
+					showOnboarding = false
+                }
+            }
+			
         }
 		.onAppear(perform: {
 			showOnboarding = true
