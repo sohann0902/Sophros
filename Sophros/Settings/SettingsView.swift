@@ -27,6 +27,7 @@ struct SettingsView: View {
 	private var nutritionGoals: FetchedResults<NutritionGoal>
 	
 	@State private var showingResetConfirmation = false
+	@State private var deleteConfirmation = DeleteConfirmation()
 	
 	private var profile: UserProfile? { profiles.first }
 	private var nutritionGoal: NutritionGoal? { nutritionGoals.first }
@@ -103,7 +104,14 @@ struct SettingsView: View {
 #if DEBUG
 					Section {
 						Button(role: .destructive) {
-							resetAppData()
+							Task {
+								guard await deleteConfirmation.confirm(
+									title: "Reset all app data?",
+									message: "All health logs, reminders, goals, and app preferences will be permanently removed.",
+									tint: Colormanager.Status.error
+								) else { return }
+								resetAppData()
+							}
 						} label: {
 							HStack(spacing: 14) {
 								Image(systemName: "trash.fill")
@@ -140,6 +148,7 @@ struct SettingsView: View {
 				print("Calorie changed:", oldValue ?? 0, "→", newValue ?? 0)
 			}
 		}
+		.deleteConfirmationOverlay(deleteConfirmation)
 	}
 	
 	private var profileCard: some View {
@@ -269,5 +278,3 @@ private struct SettingsRow: View {
 		}
 	}
 }
-
-

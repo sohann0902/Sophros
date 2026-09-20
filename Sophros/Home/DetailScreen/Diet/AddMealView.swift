@@ -28,6 +28,7 @@ struct LogMealView: View {
 	@State private var showingError = false
 	
 	@State private var showSavedMeals = false
+	@State private var deleteConfirmation = DeleteConfirmation()
 	
 	@FetchRequest(
 		sortDescriptors: [
@@ -112,6 +113,7 @@ struct LogMealView: View {
 				}
 			}
 		}
+		.deleteConfirmationOverlay(deleteConfirmation)
 	}
 	
 	private var addFromSavedcard: some View {
@@ -337,8 +339,15 @@ struct LogMealView: View {
 						.transition(.move(edge: .bottom).combined(with: .opacity))
 				}
 				.onDelete { offsets in
-					withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-						items.remove(atOffsets: offsets)
+					Task {
+						guard await deleteConfirmation.confirm(
+							title: "Delete food item?",
+							message: "This food item will be removed from this meal.",
+							tint: Colormanager.Diet.apricot
+						) else { return }
+						withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+							items.remove(atOffsets: offsets)
+						}
 					}
 				}
 			}
@@ -500,6 +509,7 @@ struct SavedMealsView: View {
 	private var savedMeals: FetchedResults<MealLog>
 	
 	@State private var showCreateMeal = false
+	@State private var deleteConfirmation = DeleteConfirmation()
 	
 	var filteredMeals : [MealLog] {
 		return savedMeals.filter { meal in
@@ -535,12 +545,20 @@ struct SavedMealsView: View {
 										
 								}
 								.buttonStyle(SelectableListCell())
-								.swipeActions(edge: .trailing) {
-									Button(role: .destructive) {
-										delete(meal)
+								.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+									Button {
+										Task {
+											guard await deleteConfirmation.confirm(
+												title: "Delete saved meal?",
+												message: "This saved meal and its food items will be permanently removed.",
+												tint: Colormanager.Diet.apricot
+											) else { return }
+											delete(meal)
+										}
 									} label: {
 										Label("Delete", systemImage: "trash")
 									}
+									.tint(Colormanager.Status.error)
 								}
 							}
 						}
@@ -581,6 +599,7 @@ struct SavedMealsView: View {
 				CreateMealView(mealDate: Date())
 			}
 		}
+		.deleteConfirmationOverlay(deleteConfirmation)
 	}
 
 	private func updateSearchPredicate(_ searchText: String) {
@@ -629,6 +648,7 @@ struct CreateMealView : View {
 	@State private var isLoading = false
 	@State private var errorMessage = ""
 	@State private var showingError = false
+	@State private var deleteConfirmation = DeleteConfirmation()
 	
 	@FetchRequest(
 		sortDescriptors: [
@@ -706,6 +726,7 @@ struct CreateMealView : View {
 				Text(errorMessage)
 			}
 		}
+		.deleteConfirmationOverlay(deleteConfirmation)
 	}
 
 	private var descriptionCard: some View {
@@ -887,8 +908,15 @@ struct CreateMealView : View {
 						.transition(.move(edge: .bottom).combined(with: .opacity))
 				}
 				.onDelete { offsets in
-					withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-						items.remove(atOffsets: offsets)
+					Task {
+						guard await deleteConfirmation.confirm(
+							title: "Delete food item?",
+							message: "This food item will be removed from this meal.",
+							tint: Colormanager.Diet.apricot
+						) else { return }
+						withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+							items.remove(atOffsets: offsets)
+						}
 					}
 				}
 			}

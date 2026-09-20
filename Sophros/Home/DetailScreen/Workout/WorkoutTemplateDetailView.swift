@@ -18,6 +18,7 @@ struct WorkoutTemplateDetailView: View {
     @State private var errorMessage = ""
     
     @State private var newExercises: [DraftWorkoutExercise] = []
+    @State private var deleteConfirmation = DeleteConfirmation()
     
     private var allowAddExercise : Bool {
         guard !newExercises.isEmpty else { return true }
@@ -73,14 +74,30 @@ struct WorkoutTemplateDetailView: View {
                         WorkoutTemplateEntryEditor(entry: entry)
                             .foregroundStyle(Colormanager.Typography.secondaryText)
                     }
-                    .onDelete(perform: deleteExercises)
+                    .onDelete { offsets in
+                        Task {
+                            guard await deleteConfirmation.confirm(
+                                title: "Delete exercise?",
+                                message: "This exercise will be permanently removed from the workout.",
+                                tint: Colormanager.Workout.terracotta
+                            ) else { return }
+                            deleteExercises(at: offsets)
+                        }
+                    }
 
                     ForEach($newExercises) { $exercise in
                         ExerciseEditorCard(exercise: $exercise)
                             .foregroundStyle(Colormanager.Typography.secondaryText)
                     }
                     .onDelete { offsets in
-                        newExercises.remove(atOffsets: offsets)
+                        Task {
+                            guard await deleteConfirmation.confirm(
+                                title: "Delete exercise?",
+                                message: "This exercise will be removed from the workout.",
+                                tint: Colormanager.Workout.terracotta
+                            ) else { return }
+                            newExercises.remove(atOffsets: offsets)
+                        }
                     }
                 }
                 .listRowBackground(Colormanager.card)
@@ -137,6 +154,7 @@ struct WorkoutTemplateDetailView: View {
         .background(Colormanager.Workout.sand)
         .navigationTitle("Edit Workout")
         .navigationBarTitleDisplayMode(.inline)
+		.deleteConfirmationOverlay(deleteConfirmation)
         .scrollDismissesKeyboard(.interactively)
         .alert("Could not save workout", isPresented: $showingError) {
             Button("OK", role: .cancel) {}

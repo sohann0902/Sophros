@@ -38,6 +38,7 @@ struct RemindersDetailView: View {
     @State private var showingNewReminder = false
     @State private var editMode: EditMode = .inactive
     @AppStorage("showRemindersOnboarding") private var showRemindersOnboarding = true
+    @State private var deleteConfirmation = DeleteConfirmation()
 
     private var displayedReminders: [Reminder] {
         selectedList == .upcoming
@@ -80,13 +81,20 @@ struct RemindersDetailView: View {
                             )
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    delete(reminder)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    Task {
+                                        guard await deleteConfirmation.confirm(
+                                            title: "Delete reminder?",
+                                            message: "This reminder and its notification will be permanently removed.",
+                                            tint: Colormanager.Reminder.periwinkle
+                                        ) else { return }
+                                        delete(reminder)
+                                    }
                                 } label: {
                                     Label("Delete", systemImage: "trash")
-										.tint(Colormanager.Reminder.periwinkle)
                                 }
+								.tint(Colormanager.Status.error)
                             }
                         }
                         .onMove(perform: move)
@@ -126,6 +134,7 @@ struct RemindersDetailView: View {
         }
         .navigationTitle("Reminders")
         .navigationBarTitleDisplayMode(.inline)
+		.deleteConfirmationOverlay(deleteConfirmation)
         .sheet(isPresented: $showingNewReminder) {
             ReminderEditorSheet(reminder: nil)
         }

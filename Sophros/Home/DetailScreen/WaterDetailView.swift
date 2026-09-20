@@ -69,6 +69,8 @@ struct WaterDetailView: View {
     @State private var presentCustomEntryForm = false
     @State private var customWaterEntry : String = "250"
 
+    @State private var deleteConfirmation = DeleteConfirmation()
+
 	@State private var reminderSheet: Bool = false
     @State private var reminderSheetDetent: PresentationDetent = .fraction(0.34)
     
@@ -138,12 +140,20 @@ struct WaterDetailView: View {
                                 )
                                 .listRowBackground(Color.clear)
                                 .listRowSeparator(.hidden)
-                                .swipeActions(edge: .trailing) {
-                                    Button(role: .destructive) {
-                                        delete(entry)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button {
+                                        Task {
+                                            guard await deleteConfirmation.confirm(
+                                                title: "Delete water entry?",
+                                                message: "This water entry will be permanently removed.",
+                                                tint: Colormanager.Water.deepBlue
+                                            ) else { return }
+                                            delete(entry)
+                                        }
                                     } label: {
                                         Label("", systemImage: "trash")
                                     }
+									.tint(Colormanager.Status.error)
                                 }
                                 .swipeActions(edge: .leading) {
                                                                     Button(role: .confirm) {
@@ -200,6 +210,7 @@ struct WaterDetailView: View {
             }
             .navigationTitle("Water")
             .navigationBarTitleDisplayMode(.inline)
+			.deleteConfirmationOverlay(deleteConfirmation)
 			.toolbar(content: {
 				ToolbarItem(placement: .topBarTrailing) {
 

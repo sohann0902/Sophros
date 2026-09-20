@@ -146,9 +146,8 @@ final class KeyboardTextFieldController: UIViewController, UITextFieldDelegate {
 
 		hostingController.view.backgroundColor = .clear
 
-		let width =
-			view.window?.bounds.width
-			?? UIScreen.main.bounds.width
+		let screenWidth = view.window?.windowScene?.screen.bounds.width ?? 0
+		let width = max(screenWidth, max(view.bounds.width, 1))
 
 		let height = hostingController.sizeThatFits(
 			in: CGSize(

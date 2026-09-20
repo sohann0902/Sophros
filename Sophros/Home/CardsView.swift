@@ -107,6 +107,18 @@ struct CardsView: View {
                 }
                 .padding()
             }
+			.mask {
+				LinearGradient(
+					stops: [
+						.init(color: .clear, location: 0),
+						.init(color: .black, location: 0.05),
+						.init(color: .black, location: 0.95),
+						.init(color: .clear, location: 1)
+					],
+					startPoint: .top,
+					endPoint: .bottom
+				)
+			}
         }
     }
 
@@ -272,6 +284,10 @@ struct CardsView: View {
     }
 }
 
+
+#Preview {
+	CardsView()
+}
 
 struct DashboardCardView: View {
     let card: DashboardCard

@@ -31,6 +31,7 @@ struct CreateWorkoutView: View {
     @State private var errorMessage = ""
     
     @State private var selectedTemplate: WorkoutTemplate?
+    @State private var deleteConfirmation = DeleteConfirmation()
     
     private var allowAddExercise : Bool {
         return exercises.last?.name != ""
@@ -69,7 +70,14 @@ struct CreateWorkoutView: View {
                             .padding(.vertical, 4)
                     }
                     .onDelete { indexSet in
-                        exercises.remove(atOffsets: indexSet)
+                        Task {
+                            guard await deleteConfirmation.confirm(
+                                title: "Delete exercise?",
+                                message: "This exercise will be removed from this workout.",
+                                tint: Colormanager.Workout.terracotta
+                            ) else { return }
+                            exercises.remove(atOffsets: indexSet)
+                        }
                     }
                 }
                 
@@ -136,12 +144,20 @@ struct CreateWorkoutView: View {
                                 Colormanager.Typography.secondaryText
                             )
                         }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                deleteTemplate(template: template)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button {
+                                Task {
+                                    guard await deleteConfirmation.confirm(
+                                        title: "Delete workout?",
+                                        message: "This saved workout and its exercises will be permanently removed.",
+                                        tint: Colormanager.Workout.terracotta
+                                    ) else { return }
+                                    deleteTemplate(template: template)
+                                }
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
+							.tint(Colormanager.Status.error)
                         }
                     }
                     .listRowBackground(Colormanager.card)
@@ -174,6 +190,7 @@ struct CreateWorkoutView: View {
                 WorkoutTemplateDetailView(template: template)
             }
         }
+        .deleteConfirmationOverlay(deleteConfirmation)
     }
 
     private func saveTemplate() {

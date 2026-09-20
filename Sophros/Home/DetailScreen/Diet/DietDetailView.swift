@@ -36,6 +36,7 @@ struct DietDetailView: View {
 	@State private var showingSaveMeal = false
 	@State private var showingCalendar = false
 	@State private var showingGoalOnboarding = false
+	@State private var deleteConfirmation = DeleteConfirmation()
 	
 	private var nutritionGoal: NutritionGoal? { nutritionGoals.first }
 	private var userProfile: UserProfile? { userProfiles.first }
@@ -214,6 +215,7 @@ struct DietDetailView: View {
 		}
 		.navigationTitle("Diet")
 		.navigationBarTitleDisplayMode(.inline)
+		.deleteConfirmationOverlay(deleteConfirmation)
 		.animation(.easeInOut(duration: 0.2), value: showingCalendar)
 		.animation(.easeInOut(duration: 0.4), value: showingGoalOnboarding)
 		.navigationDestination(isPresented: $showingAddMeal) {
@@ -271,13 +273,21 @@ struct DietDetailView: View {
 				MealLogRow(meal: meal)
 					.swipeActions(
 						edge: .trailing,
-						allowsFullSwipe: true
+						allowsFullSwipe: false
 					) {
-						Button(role: .destructive) {
-							delete(meal)
+						Button {
+							Task {
+								guard await deleteConfirmation.confirm(
+									title: "Delete meal?",
+									message: "This meal and its food items will be permanently removed.",
+									tint: Colormanager.Diet.apricot
+								) else { return }
+								delete(meal)
+							}
 						} label: {
 							Label("Delete", systemImage: "trash")
 						}
+						.tint(Colormanager.Status.error)
 					}
 					.listRowInsets(
 						EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
