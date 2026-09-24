@@ -82,21 +82,46 @@ struct DeleteConfirmationOverlay: View {
                         Text(request.message)
                             .font(.body)
                             .foregroundStyle(Colormanager.Typography.secondaryText)
+							.multilineTextAlignment(.leading)
+							.frame(maxWidth: .infinity, alignment: .leading)
 
                         HStack(spacing: 12) {
-                            Button("Cancel") { confirmation.cancel() }
-                                .font(.headline)
-                                .foregroundStyle(Colormanager.Typography.primaryText)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(Colormanager.secondaryBg, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-
-                            Button("Delete") { confirmation.accept() }
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(request.tint, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+							Button {
+								confirmation.cancel()
+								HapticManager.selection()
+							} label: {
+								Text("Cancel")
+									.font(.headline)
+									.foregroundStyle(.white)
+									.frame(maxWidth: .infinity)
+									.padding(.vertical, 14)
+									.contentShape(
+										RoundedRectangle(cornerRadius: 15, style: .continuous)
+									)
+									.background(
+										request.tint,
+										in: RoundedRectangle(cornerRadius: 15, style: .continuous)
+									)
+							}
+							
+							Button {
+								confirmation.accept()
+								HapticManager.warning()
+							} label: {
+								Text("Delete")
+									.font(.headline)
+									.foregroundStyle(.white)
+									.frame(maxWidth: .infinity)
+									.padding(.vertical, 14)
+									.contentShape(
+										RoundedRectangle(cornerRadius: 15, style: .continuous)
+									)
+									.background(
+										request.tint,
+										in: RoundedRectangle(cornerRadius: 15, style: .continuous)
+									)
+							}
+							
                         }
                     }
 					.frame(maxWidth: .infinity)

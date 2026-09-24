@@ -19,7 +19,7 @@ struct CycleDetailView: View {
     @State private var scrollToTodayRequest = 0
     @State private var cycleDataRevision = 0
     @State private var hasStartedHealthKitImport = false
-    @AppStorage("hasSeenCycleOnboarding") private var hasSeenCycleOnboarding = false
+    @AppStorage("showCycleOnboarding") private var showCycleOnboarding = true
 
     private let calendar = Calendar.current
 
@@ -81,17 +81,17 @@ struct CycleDetailView: View {
                     }
                     .padding(.bottom, 32)
                 }
-
-                if !hasSeenCycleOnboarding {
+				
+				FadeOverlay(isPresented: $showCycleOnboarding) {
 					FeatureOnboardingOverlay(
 						tint: Colormanager.MenstrualCycle.blush, background: Colormanager.MenstrualCycle.dustyRose,
 						title: "Your cycle, in one place",
 						message: "Log period days and symptoms to see your cycle history and predicted phases. Your information stays on your device.",
 						content: { EmptyView() }
 					) {
-                        hasSeenCycleOnboarding = true
+						showCycleOnboarding = false
 						importHealthKitHistoryForTesting()
-                    }
+					}
                 }
             }
             .navigationTitle("Cycle")
@@ -109,6 +109,7 @@ struct CycleDetailView: View {
                 ) {
                     performCycleMutation {
                         _ = try store.togglePeriod(on: selectedDate)
+						HapticManager.success()
                     }
                 }
                 .presentationDetents([.fraction(0.34)])
@@ -120,6 +121,7 @@ struct CycleDetailView: View {
                 SexLogSheet(date: selectedDate, loggedType: sexType(for: selectedDate)) { type in
                     performCycleMutation {
                         _ = try store.setSexType(type, on: selectedDate)
+						HapticManager.success()
                     }
                 }
                 .presentationDetents([.fraction(0.34)])
@@ -131,6 +133,7 @@ struct CycleDetailView: View {
                 SymptomPickerSheet(date: selectedDate, selectedKeys: Set(selectedStatus.loggedSymptoms)) { key in
                     performCycleMutation {
                         _ = try store.toggleSymptom(key, on: selectedDate)
+						HapticManager.selection()
                     }
                 }
                 .presentationDetents([.medium, .large])
@@ -138,7 +141,7 @@ struct CycleDetailView: View {
                 .presentationCornerRadius(30)
                 .presentationBackground(Colormanager.baseBackground)
             }
-            .sheet(isPresented: $showingPhaseInfo) { PhaseInfoSheet(phase: selectedStatus.phase) }
+			.sheet(isPresented: $showingPhaseInfo) { PhaseInfoSheet(phase: selectedStatus.phase) }
     }
 
     private var dateCarousel: some View {
@@ -203,12 +206,13 @@ struct CycleDetailView: View {
                     }
                     .onChange(of: scrollToTodayRequest) { _, _ in
                         let today = calendar.startOfDay(for: .now)
-                        withAnimation(.smooth(duration: 0.55, extraBounce: 0)) {
+						withAnimation(.smooth(duration: 0.55, extraBounce: 0)) {
                             scrollPosition = today
                         }
                     }
                     .onChange(of: scrollPosition) { _, newDate in
                         guard let newDate else { return }
+						HapticManager.selection()
                         selectedDate = calendar.startOfDay(for: newDate)
                     }
                 }
@@ -319,6 +323,9 @@ struct CycleDetailView: View {
                     HStack(spacing: 8) {
                         ForEach(selectedStatus.loggedSymptoms, id: \.self) { key in
                             SymptomPill(symptom: CycleSymptomOption.option(for: key))
+								.onTapGesture {
+									showingSymptoms = true
+								}
                         }
                     }
                 }
@@ -678,33 +685,209 @@ private struct CycleSummaryRow: View {
 private struct PhaseInfoSheet: View {
     let phase: CyclePhase?
     @Environment(\.dismiss) private var dismiss
+	
+	var phaseText: AttributedString {
+		var text = AttributedString("It's likely you're in ")
+
+		var phaseTitle = AttributedString(phase?.title ?? "")
+		phaseTitle.foregroundColor = UIColor(
+			Colormanager.MenstrualCycle.dustyRose
+		)
+
+		text.append(phaseTitle)
+
+		return text
+	}
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 18) {
-                Text(phase?.title ?? "Your cycle").font(.title.bold())
-                Text(phase?.information ?? "Log your period to begin seeing your cycle phase here.")
-                    .foregroundStyle(Colormanager.Typography.secondaryText)
-                Divider()
-                Text("The four phases")
-                    .font(.headline)
-                ForEach(CyclePhase.allCases) { item in
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(item.title).font(.subheadline.weight(.semibold))
-                        Text(item.information)
-                            .font(.footnote)
-                            .foregroundStyle(Colormanager.Typography.secondaryText)
-                    }
-                }
-                Spacer()
-            }
-            .padding(24)
-            .navigationTitle("Cycle phase")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done", action: dismiss.callAsFunction) } }
-        }
-        .presentationDetents([.medium])
+		NavigationStack {
+			ScrollView {
+				VStack(alignment: .leading, spacing: 24) {
+
+					// MARK: - Cycle Illustration
+					Image("CyclePhase")
+						.resizable()
+						.scaledToFit()
+						.frame(maxWidth: .infinity)
+						.padding(.horizontal, 4)
+
+
+					// MARK: - Introduction
+
+					VStack(alignment: .leading, spacing: 12) {
+						
+						Text(phaseText)
+							.font(.title.bold())
+							.foregroundStyle(Colormanager.Typography.primaryText)
+							.multilineTextAlignment(.center)
+
+						Text("Understanding Your Menstrual Cycle")
+							.font(.title2.bold())
+							.foregroundStyle(Colormanager.Typography.primaryText)
+
+						Text("""
+						Your menstrual cycle is a natural process in which your body moves through a series of hormonal changes. These changes prepare your body for a possible pregnancy and can also influence your energy, mood, appetite, sleep, and how you feel physically.
+
+						A cycle is commonly described in four phases: menstrual, follicular, ovulation, and luteal. The length and experience of each phase can vary from person to person, and even from one cycle to the next.
+
+						Think of these phases as a way to better understand your body, rather than as a strict schedule you need to follow.
+						""")
+						.font(.body)
+						.foregroundStyle(Colormanager.Typography.secondaryText)
+						.lineSpacing(5)
+					}
+
+
+					// MARK: - Menstrual Phase
+
+					CyclePhaseSection(
+						title: "Menstrual Phase",
+						subtitle: "A time to slow down and reset",
+						color: Colormanager.MenstrualCycle.dustyRose,
+						text: """
+						The menstrual phase begins on the first day of your period. During this time, the uterus sheds the lining it built during the previous cycle, resulting in menstrual bleeding. Estrogen and progesterone levels are relatively low, and some people may experience lower energy, cramps, bloating, headaches, or changes in mood.
+
+						This can be a natural time to slow down and give your body some extra care. Prioritizing sleep, staying hydrated, and eating nourishing meals can help you feel supported. Gentle movement such as walking, stretching, or yoga may feel comfortable, but there is no need to exercise at a particular intensity if your body is asking for rest.
+						"""
+					)
+
+
+					// MARK: - Follicular Phase
+
+					CyclePhaseSection(
+						title: "Follicular Phase",
+						subtitle: "Energy begins to rise",
+						color: Colormanager.MenstrualCycle.dustyRose,
+						text: """
+						The follicular phase begins on the first day of your period and continues until ovulation, which means it overlaps with the menstrual phase. During this phase, follicles in the ovaries develop as your body prepares an egg for ovulation. Estrogen gradually rises and the uterine lining begins to build again.
+
+						As hormone levels change, some people notice that their energy, motivation, and mood begin to improve after their period. You may naturally feel more ready for activity or new challenges. Balanced meals, adequate hydration, regular movement, and good sleep can support your body as it moves toward ovulation.
+						"""
+					)
+
+
+					// MARK: - Ovulation Phase
+
+					CyclePhaseSection(
+						title: "Ovulation Phase",
+						subtitle: "A moment of transition",
+						color: Colormanager.MenstrualCycle.dustyRose,
+						text: """
+						Ovulation occurs when an ovary releases a mature egg. This is triggered by a rise in luteinizing hormone and usually happens around the middle of the cycle, although the timing can vary considerably between people and between cycles.
+
+						Some people notice increased energy, changes in cervical mucus, or mild pelvic discomfort around ovulation, while others may not notice any obvious changes at all. If you feel energetic during this time, you can continue with your usual activities and workouts. Your body does not need to be pushed simply because you are ovulating—how you feel is still the best guide.
+						"""
+					)
+
+
+					// MARK: - Luteal Phase
+
+					CyclePhaseSection(
+						title: "Luteal Phase",
+						subtitle: "A time to nourish and recover",
+						color: Colormanager.MenstrualCycle.dustyRose,
+						text: """
+						The luteal phase begins after ovulation and continues until your next period. During this phase, progesterone rises as the body prepares for a possible pregnancy. If pregnancy does not occur, estrogen and progesterone eventually fall, which signals the beginning of the next menstrual period.
+
+						You may notice changes in appetite, energy, mood, sleep, or physical comfort during this phase. Some people experience symptoms associated with premenstrual syndrome, such as bloating, breast tenderness, irritability, or fatigue, while others experience very few noticeable changes.
+
+						This can be a good time to focus on nourishment, hydration, sleep, and recovery. Your appetite may change naturally, so rather than ignoring hunger, focus on balanced meals that provide protein, fiber, carbohydrates, healthy fats, and plenty of nutrients. Exercise can remain part of your routine, but adjusting the intensity according to your energy and comfort is completely okay.
+						"""
+					)
+
+
+					// MARK: - Your Cycle Is Unique
+
+					VStack(alignment: .leading, spacing: 12) {
+
+						Text("Your Cycle Is Unique")
+							.font(.title3.bold())
+							.foregroundStyle(Colormanager.Typography.primaryText)
+
+						Text("""
+						There is no single way a menstrual cycle should feel. Cycle length, hormone patterns, symptoms, energy levels, and the timing of each phase can differ from person to person. Even your own cycle may not feel exactly the same every month.
+
+						Use this information as a guide to become more aware of your body, not as a set of rules you have to follow. Listen to your energy, notice your patterns, and give your body what it needs.
+						""")
+						.font(.body)
+						.foregroundStyle(Colormanager.Typography.secondaryText)
+						.lineSpacing(5)
+					}
+
+
+					// MARK: - Disclaimer
+
+					VStack(alignment: .leading, spacing: 8) {
+
+//						Text("A note from Sophros")
+//							.font(.headline)
+//							.foregroundStyle(Colormanager.Typography.primaryText)
+
+						Text("""
+						This information is intended for general education and is not a substitute for medical advice. If you experience severe pain, unusually heavy bleeding, significant changes in your cycle, or symptoms that concern you, consider speaking with a qualified healthcare professional.
+						""")
+						.font(.footnote)
+						.foregroundStyle(Colormanager.Typography.secondaryText)
+						.lineSpacing(4)
+						.italic()
+					}
+				}
+				.padding()
+			}
+			.scrollIndicators(.hidden)
+			.toolbar {
+				ToolbarItem(placement: .topBarTrailing) {
+					Button {
+						dismiss()
+					} label: {
+						Image(systemName: "xmark")
+					}
+					.buttonStyle(.glassProminent)
+					.tint(Colormanager.MenstrualCycle.dustyRose)
+				}
+			}
+		}
+		.presentationDetents([.medium, .large])
+		.presentationBackground(Colormanager.card)
     }
+}
+
+#Preview {
+	PhaseInfoSheet(phase: .ovulation)
+}
+
+private struct CyclePhaseSection: View {
+
+	let title: String
+	let subtitle: String
+	let color: Color
+	let text: String
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 14) {
+
+			VStack(alignment: .leading, spacing: 4) {
+
+				Text(title)
+					.font(.title3.bold())
+					.foregroundStyle(Colormanager.Typography.primaryText)
+
+				Text(subtitle)
+					.font(.subheadline.weight(.medium))
+					.foregroundStyle(color)
+			}
+
+			Text(text)
+				.font(.body)
+				.foregroundStyle(Colormanager.Typography.secondaryText)
+				.lineSpacing(5)
+		}
+		.padding(18)
+		.background(
+			color.opacity(0.10),
+			in: RoundedRectangle(cornerRadius: 20)
+		)
+	}
 }
 
 private struct SymptomPickerSheet: View {
@@ -786,7 +969,10 @@ private struct SymptomPickerSheet: View {
                 ], startPoint: .top, endPoint: .bottom)
             }
 
-            Button(action: dismiss.callAsFunction) {
+			Button{
+				dismiss()
+				HapticManager.success()
+			} label: {
                 Text("Done")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)

@@ -187,7 +187,9 @@ struct WorkoutTemplateDetailView: View {
             errorMessage = "Please fill all values of Exercise."
             return
         }
-
+		
+		HapticManager.success()
+		
         for (index, draft) in validNewExercises.enumerated() {
             let entry = WorkoutTemplateEntry(context: viewContext)
             entry.id = UUID()

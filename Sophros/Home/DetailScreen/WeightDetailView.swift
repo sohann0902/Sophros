@@ -19,6 +19,8 @@ struct WeightDetailView: View {
     @State private var goalText = ""
     @State private var showingGoalOnboarding = false
     @State private var onboardingGoalText = ""
+	
+	@FocusState var focused
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \WeightEntry.createdAt, ascending: false)],
@@ -66,6 +68,9 @@ struct WeightDetailView: View {
                 .tint(.white)
 				.colorMultiply(Colormanager.Calendar.green)
                 .padding(.horizontal, 24)
+				.onChange(of: selectedRange) {
+					HapticManager.selection()
+				}
 					
 					Button {
 						showingLogWeight = true
@@ -96,6 +101,7 @@ struct WeightDetailView: View {
 					actionEnabled: validOnboardingGoal,
 					content: {
 						OnboardingNumericField(title: "Target weight", unit: "kg", placeholder: "65", value: $onboardingGoalText)
+							.focused($focused)
 					},
 					action: saveOnboardingGoal
 				)
@@ -110,6 +116,7 @@ struct WeightDetailView: View {
 					actionEnabled: !weightText.isEmpty && (Double(weightText) ?? 0) > 0,
 					content: {
 						OnboardingNumericField(title: "Weight", unit: "kg", placeholder: "50", value: $weightText)
+							.focused($focused)
 					},
 					action: saveWeight, showing: $showingLogWeight
 				)
@@ -124,6 +131,8 @@ struct WeightDetailView: View {
 					actionEnabled: !goalText.isEmpty && (Double(goalText) ?? 0) > 0,
 					content: {
 						OnboardingNumericField(title: "Weight in kg", unit: "kg", placeholder: "50", value: $goalText)
+							.focused($focused)
+						
 					},
 					action: setGoal, showing: $showingGoalEditor
 				)
@@ -237,11 +246,14 @@ struct WeightDetailView: View {
         entry.updatedAt = .now
         try? context.save()
         weightText = ""
+		
+		HapticManager.selection()
+		showingLogWeight = false
+		focused = false
     }
 
     private func setGoal() {
         guard let value = Double(goalText), value > 0 else { return }
-		showingGoalEditor = false
         let goal = weightGoals.first ?? WeightGoal(context: context)
         if goal.id == nil {
             goal.id = UUID()
@@ -251,6 +263,10 @@ struct WeightDetailView: View {
         goal.updatedAt = .now
         try? context.save()
         goalText = ""
+		
+		HapticManager.selection()
+		showingGoalEditor = false
+		focused = false
     }
 
     private var validOnboardingGoal: Bool {
@@ -264,6 +280,7 @@ struct WeightDetailView: View {
         setGoal()
         onboardingGoalText = ""
         showingGoalOnboarding = false
+		focused = false
     }
 }
 

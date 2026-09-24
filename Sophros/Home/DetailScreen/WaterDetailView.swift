@@ -72,7 +72,7 @@ struct WaterDetailView: View {
     @State private var deleteConfirmation = DeleteConfirmation()
 
 	@State private var reminderSheet: Bool = false
-    @State private var reminderSheetDetent: PresentationDetent = .fraction(0.34)
+    @State private var reminderSheetDetent: PresentationDetent = .fraction(0.28)
     
     private let waterAmounts = Array(stride(from: 0, through: 1000, by: 50))
     
@@ -91,6 +91,7 @@ struct WaterDetailView: View {
                             waterProgress
 								.onTapGesture {
 									showingGoalOnboarding = true
+									HapticManager.medium()
 								}
                             
                             HStack(spacing: 0) {
@@ -145,7 +146,7 @@ struct WaterDetailView: View {
                                         Task {
                                             guard await deleteConfirmation.confirm(
                                                 title: "Delete water entry?",
-                                                message: "This water entry will be permanently removed.",
+                                                message: "This water entry will be removed.",
                                                 tint: Colormanager.Water.deepBlue
                                             ) else { return }
                                             delete(entry)
@@ -161,6 +162,7 @@ struct WaterDetailView: View {
                                                                     } label: {
                                                                         Label("", systemImage: "square.and.pencil")
                                                                     }
+																	.tint(Colormanager.Water.deepBlue)
                                 }
                         }
                     } header: {
@@ -172,6 +174,43 @@ struct WaterDetailView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
 				.safeAreaPadding(.bottom, 24)
+				
+				FadeOverlay(isPresented: $updateWaterEntry) {
+					LogWeightView(
+						tint: Colormanager.Water.deepBlue, background: Colormanager.Water.lightBlue,
+						title: "Update Quantity",
+						message: "Enter the amount of water in ml",
+						actionTitle: "Save",
+						actionEnabled: !customWaterEntry.isEmpty && (Double(customWaterEntry) ?? 0) > 0,
+						content: {
+							OnboardingNumericField(title: "Amount", unit: "ml", placeholder: customWaterEntry, value: $customWaterEntry)
+						},
+						action: {
+							update()
+						}, showing: $updateWaterEntry
+					)
+				}
+				
+				FadeOverlay(isPresented: $presentCustomEntryForm) {
+					LogWeightView(
+						tint: Colormanager.Water.deepBlue, background: Colormanager.Water.lightBlue,
+						title: "Add Water",
+						message: "Enter the amount of water in ml",
+						actionTitle: "Save",
+						actionEnabled: !customWaterEntry.isEmpty && (Double(customWaterEntry) ?? 0) > 0,
+						content: {
+							OnboardingNumericField(title: "Amount", unit: "ml", placeholder: customWaterEntry, value: $customWaterEntry)
+						},
+						action: {
+							guard let customWaterEntry = Int(customWaterEntry), customWaterEntry > 0 else {
+								return
+							}
+							
+							addWater(customWaterEntry)
+							
+						}, showing: $presentCustomEntryForm
+					)
+				}
 
                 FadeOverlay(isPresented: $showingCalendar) {
                     ZStack {
@@ -224,6 +263,7 @@ struct WaterDetailView: View {
 					}
 					.buttonStyle(.glassProminent)
 					.tint(Colormanager.Water.skyBlue.opacity(0.7))
+					.disabled(isAlertPresenting)
 				}
 			})
 
@@ -234,48 +274,15 @@ struct WaterDetailView: View {
 					selection: $reminderSheetDetent
 				)
 				.presentationDragIndicator(.hidden)
-				.presentationCornerRadius(30)
+				.presentationCornerRadius(20)
 				.presentationBackground(Colormanager.Water.skyBlue.opacity(0.2))
 			})
             .onAppear { showingGoalOnboarding = goal.isEmpty }
-            .alert("Add Water", isPresented: $presentCustomEntryForm) {
-                TextField("Amount in ml", text: $customWaterEntry)
-                    .keyboardType(.numberPad)
-                Button("Cancel", role: .cancel) {
-                    customWaterEntry = "250"
-                }
-                
-                Button("Save") {
-                    guard let customWaterEntry = Int(customWaterEntry), customWaterEntry > 0 else {
-                        return
-                    }
-                    
-                    addWater(customWaterEntry)
-                    self.customWaterEntry = "250"
-                }
-            } message: {
-                Text("Enter the amount of water in milliliters.")
-            }
-            .alert("Upate Quantity", isPresented: $updateWaterEntry) {
-                TextField("Amount in ml", text: $customWaterEntry)
-                    .keyboardType(.numberPad)
-                Button("Cancel", role: .cancel) {
-                    customWaterEntry = "250"
-                }
-                
-                Button("Save") {
-                    guard let customWaterEntry = Int(customWaterEntry), customWaterEntry > 0 else {
-                        return
-                    }
-                    
-                    update()
-                    self.customWaterEntry = "250"
-                }
-            } message: {
-                Text("Enter the amount of water in milliliters.")
-            }
     }
-
+	
+	private var isAlertPresenting : Bool {
+		return showingCalendar || updateWaterEntry || presentCustomEntryForm || showingGoalOnboarding
+	}
     private var validGoalInput: Bool {
         guard let amount = Int(goalInput) else { return false }
         return (250...10_000).contains(amount)
@@ -283,6 +290,9 @@ struct WaterDetailView: View {
 
     private func saveGoal() {
         guard let amount = Int(goalInput), (250...10_000).contains(amount) else { return }
+		
+		HapticManager.selection()
+		
         let waterGoal = WaterGoal(context: context)
         waterGoal.id = UUID()
         waterGoal.amountML = Int64(amount)
@@ -347,6 +357,7 @@ struct WaterDetailView: View {
     private func quickAddButton(_ title: String, amount: Int) -> some View {
         Button {
             addWater(amount)
+			HapticManager.medium()
         } label: {
             Text(title)
                 .frame(maxWidth: .infinity)
@@ -398,8 +409,9 @@ struct WaterDetailView: View {
     }
     
     private func addWater(_ amount: Int) {
+		HapticManager.medium()
+		
         let entryDate: Date
-
         if calendar.isDateInToday(selectedDate) {
             entryDate = .now
         } else {
@@ -422,6 +434,8 @@ struct WaterDetailView: View {
         
         do {
             try context.save()
+			presentCustomEntryForm = false
+			self.customWaterEntry = "250"
         } catch {
             print("Could not save water entry: \(error.localizedDescription)")
         }
@@ -443,12 +457,14 @@ struct WaterDetailView: View {
     
     private func update() {
         guard let entry = entryBeingEdited else { return }
-        
+		HapticManager.medium()
         entry.amountML = Int64(customWaterEntry) ?? entry.amountML
         entry.updatedAt = .now
         
         do {
             try context.save()
+			self.customWaterEntry = "250"
+			updateWaterEntry = false
         } catch {
             print("Could not update water entry: \(error.localizedDescription)")
         }
@@ -511,7 +527,7 @@ private struct WaterReminderSheet: View {
                 .foregroundStyle(Colormanager.Typography.primaryText)
                 .onChange(of: isEnabled) { _, enabled in
                     withAnimation(.easeInOut(duration: 0.25)) {
-                        detent = enabled ? .fraction(0.5) : .fraction(0.24)
+                        detent = enabled ? .fraction(0.5) : .fraction(0.28)
                     }
                 }
 
@@ -554,7 +570,7 @@ private struct WaterReminderSheet: View {
             }
 
             Button(action: save) {
-                Text(isEnabled ? "Save" : "Turn off reminders")
+                Text("Save")
                     .font(.headline)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -564,7 +580,7 @@ private struct WaterReminderSheet: View {
                         in: RoundedRectangle(cornerRadius: 15)
                     )
             }
-			.opacity(isEnabled ? 1 : 0)
+//			.opacity(isEnabled ? 1 : 0)
             .disabled(isEnabled && !hasValidWindow)
             .opacity(isEnabled && !hasValidWindow ? 0.45 : 1)
 			.padding(.top)
@@ -576,14 +592,15 @@ private struct WaterReminderSheet: View {
             intervalHours = savedIntervalHours
             startTime = date(for: savedStartMinutes)
             endTime = date(for: savedEndMinutes)
-            detent = isEnabled ? .fraction(0.5) : .fraction(0.24)
+            detent = isEnabled ? .fraction(0.5) : .fraction(0.28)
         }
 		.onDisappear{
-			detent = .fraction(0.24)
+			detent = .fraction(0.28)
 		}
     }
 
     private func save() {
+		HapticManager.medium()
         savedIsEnabled = isEnabled
         savedIntervalHours = intervalHours
         savedStartMinutes = minutesSinceMidnight(startTime)

@@ -135,16 +135,16 @@ struct LogMealView: View {
 				}
 				
 				Image(systemName: "chevron.right")
-					.padding(.leading)
+					.padding(.horizontal)
 			}
 			.padding(.vertical)
 			.frame(maxWidth: .infinity)
-			.background(Colormanager.Accent.button.opacity(0.4))
 			.clipShape(
 				RoundedRectangle(cornerRadius: 20, style: .continuous)
 			)
 			.onTapGesture {
 				showSavedMeals = true
+				HapticManager.selection()
 			}
 		}
 		.padding(3)
@@ -254,6 +254,9 @@ struct LogMealView: View {
 				}
 				.colorMultiply(Colormanager.Accent.selected)
 				.pickerStyle(.palette)
+				.onChange(of: mealType) { _, _ in
+					HapticManager.selection()
+				}
 				
 				HStack(alignment: .center) {
 					DatePicker(
@@ -337,19 +340,37 @@ struct LogMealView: View {
 							EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
 						)
 						.transition(.move(edge: .bottom).combined(with: .opacity))
-				}
-				.onDelete { offsets in
-					Task {
-						guard await deleteConfirmation.confirm(
-							title: "Delete food item?",
-							message: "This food item will be removed from this meal.",
-							tint: Colormanager.Diet.apricot
-						) else { return }
-						withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-							items.remove(atOffsets: offsets)
+						.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+							Button {
+								Task {
+									guard await deleteConfirmation.confirm(
+										title: "Delete food item?",
+										message: "This food item will be removed from this meal.",
+										tint:  Colormanager.Accent.button
+									) else { return }
+									
+									if let index = items.firstIndex(where: { $0.id == item.id }) {
+										items.remove(at: index)
+									}
+								}
+							} label: {
+								Label("", systemImage: "trash")
+							}
+							.tint(Colormanager.Status.error)
 						}
-					}
 				}
+//				.onDelete { offsets in
+//					Task {
+//						guard await deleteConfirmation.confirm(
+//							title: "Delete food item?",
+//							message: "This food item will be removed from this meal.",
+//							tint: Colormanager.Diet.apricot
+//						) else { return }
+//						withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+//							items.remove(atOffsets: offsets)
+//						}
+//					}
+//				}
 			}
 
 		} header: {
@@ -414,6 +435,7 @@ struct LogMealView: View {
 
 			withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
 				items.insert(contentsOf: newItems, at: 0)
+				HapticManager.success()
 			}
 			return true
 		} catch {
@@ -425,6 +447,8 @@ struct LogMealView: View {
 
 	private func saveMeal(kind: MealKind) {
 		guard !items.isEmpty else { return }
+		HapticManager.success()
+		
 		let title = title.isEmpty ? items.first?.name : title.trimmingCharacters(in: .whitespacesAndNewlines)
 		
 			let meal = MealLog(context: viewContext)
@@ -467,6 +491,7 @@ struct LogMealView: View {
 	}
 	
 	private func addSavedMeal(_ meal: MealLog) {
+		HapticManager.success()
 		let drafts = meal.sortedItems.map { item in
 			DraftMealItem(
 				name: item.name ?? "Food item",
@@ -830,6 +855,9 @@ struct CreateMealView : View {
 				}
 				.colorMultiply(Colormanager.Accent.selected)
 				.pickerStyle(.palette)
+				.onChange(of: mealType) { oldValue, newValue in
+					HapticManager.selection()
+				}
 
 			}
 			.padding()
@@ -906,18 +934,24 @@ struct CreateMealView : View {
 							EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
 						)
 						.transition(.move(edge: .bottom).combined(with: .opacity))
-				}
-				.onDelete { offsets in
-					Task {
-						guard await deleteConfirmation.confirm(
-							title: "Delete food item?",
-							message: "This food item will be removed from this meal.",
-							tint: Colormanager.Diet.apricot
-						) else { return }
-						withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-							items.remove(atOffsets: offsets)
+						.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+							Button {
+								Task {
+									guard await deleteConfirmation.confirm(
+										title: "Delete food item?",
+										message: "This food item will be removed from this meal.",
+										tint:  Colormanager.Accent.button
+									) else { return }
+									
+									if let index = items.firstIndex(where: { $0.id == item.id }) {
+										items.remove(at: index)
+									}
+								}
+							} label: {
+								Label("", systemImage: "trash")
+							}
+							.tint(Colormanager.Status.error)
 						}
-					}
 				}
 			}
 
@@ -979,6 +1013,7 @@ struct CreateMealView : View {
 				showingError = true
 				return false
 			}
+			HapticManager.success()
 
 			withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
 				items.insert(contentsOf: newItems, at: 0)
@@ -993,6 +1028,7 @@ struct CreateMealView : View {
 
 	private func saveMeal(kind: MealKind) {
 		guard !items.isEmpty else { return }
+		HapticManager.success()
 		let title = title.isEmpty ? items.first?.name : title.trimmingCharacters(in: .whitespacesAndNewlines)
 		
 			let meal = MealLog(context: viewContext)

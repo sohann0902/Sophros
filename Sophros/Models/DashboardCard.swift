@@ -21,6 +21,7 @@ struct DashboardCard: Identifiable {
     let value: String
     let subtitle: String
     var progress: Double? = nil
+	var background: Color?
     
     static let cards : [DashboardCard] = [
         .init(type: .water, icon: "waterbottle.fill", iconColor: .blue,

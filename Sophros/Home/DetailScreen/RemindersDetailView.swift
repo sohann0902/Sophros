@@ -62,6 +62,9 @@ struct RemindersDetailView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 				.colorMultiply(Colormanager.Reminder.periwinkle)
+				.onChange(of: selectedList) { oldValue, newValue in
+					HapticManager.selection()
+				}
 
                 if displayedReminders.isEmpty {
                     emptyState
@@ -107,6 +110,7 @@ struct RemindersDetailView: View {
 
             Button {
                 showingNewReminder = true
+				HapticManager.selection()
             } label: {
                 Image(systemName: "plus")
                     .font(.title2.weight(.bold))
@@ -170,6 +174,7 @@ struct RemindersDetailView: View {
         save()
         context.processPendingChanges()
         syncNotification(for: reminder)
+		HapticManager.success()
     }
 
     private func move(from source: IndexSet, to destination: Int) {
@@ -421,6 +426,7 @@ private struct ReminderEditorSheet: View {
                 )
             }
             dismiss()
+			HapticManager.success()
         } catch {
             print("Could not save reminder: \(error.localizedDescription)")
         }

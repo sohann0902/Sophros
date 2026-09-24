@@ -173,25 +173,38 @@ struct LogWeightView<Content: View>: View {
 
 				content
 
-				Button(action: action) {
-					Text(actionTitle)
-						.font(.system(size: 17, weight: .bold))
-						.foregroundStyle(.white)
-						.frame(maxWidth: .infinity)
-						.padding(.vertical, 15)
-						.background(background, in: RoundedRectangle(cornerRadius: 15))
+				HStack {
+					
+					Button(action: cancelAction) {
+						Text("Cancel")
+							.font(.system(size: 17, weight: .bold))
+							.foregroundStyle(.white)
+							.frame(maxWidth: .infinity)
+							.padding(.vertical, 15)
+							.background(tint, in: RoundedRectangle(cornerRadius: 15))
+					}
+					
+					
+					Button(action: action) {
+						Text(actionTitle)
+							.font(.system(size: 17, weight: .bold))
+							.foregroundStyle(.white)
+							.frame(maxWidth: .infinity)
+							.padding(.vertical, 15)
+							.background(tint, in: RoundedRectangle(cornerRadius: 15))
+					}
+					.disabled(!actionEnabled)
+					.opacity(actionEnabled ? 1 : 0.45)
 				}
-				.disabled(!actionEnabled)
-				.opacity(actionEnabled ? 1 : 0.45)
 			}
 			.padding(24)
 			.background(
 				ZStack {
 					Colormanager.card
 					LinearGradient(colors: [
-						tint.opacity(0.2),
-						tint.opacity(0.1),
-						tint.opacity(0.2),
+						background.opacity(0.2),
+						background.opacity(0.1),
+						background.opacity(0.2),
 						.clear
 					], startPoint: .top, endPoint: .bottom)
 				})
@@ -201,5 +214,10 @@ struct LogWeightView<Content: View>: View {
 			.padding(24)
 		}
 		.accessibilityAddTraits(.isModal)
+	}
+	
+	private func cancelAction() {
+		HapticManager.selection()
+		showing = false
 	}
 }

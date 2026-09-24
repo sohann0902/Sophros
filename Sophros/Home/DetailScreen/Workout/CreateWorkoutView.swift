@@ -26,7 +26,7 @@ struct CreateWorkoutView: View {
     
     @State private var title = ""
     @State private var note = ""
-    @State private var exercises: [DraftWorkoutExercise] = []
+    @State private var exercises: [DraftWorkoutExercise] = [DraftWorkoutExercise()]
     @State private var showingError = false
     @State private var errorMessage = ""
     
@@ -68,23 +68,42 @@ struct CreateWorkoutView: View {
                         ExerciseEditorCard(exercise: $exercise)
                             .listRowBackground(Colormanager.card)
                             .padding(.vertical, 4)
+							.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+								Button {
+									Task {
+										guard await deleteConfirmation.confirm(
+											title: "Delete exercise?",
+											message: "This exercise will be removed from this workout.",
+											tint:  Colormanager.Workout.terracotta
+										) else { return }
+										
+										if let index = exercises.firstIndex(where: { $0.id == exercise.id }) {
+											exercises.remove(at: index)
+										}
+									}
+								} label: {
+									Label("", systemImage: "trash")
+								}
+								.tint(Colormanager.Status.error)
+							}
                     }
-                    .onDelete { indexSet in
-                        Task {
-                            guard await deleteConfirmation.confirm(
-                                title: "Delete exercise?",
-                                message: "This exercise will be removed from this workout.",
-                                tint: Colormanager.Workout.terracotta
-                            ) else { return }
-                            exercises.remove(atOffsets: indexSet)
-                        }
-                    }
+//                    .onDelete { indexSet in
+//                        Task {
+//                            guard await deleteConfirmation.confirm(
+//                                title: "Delete exercise?",
+//                                message: "This exercise will be removed from this workout.",
+//                                tint: Colormanager.Workout.terracotta
+//                            ) else { return }
+//                            exercises.remove(atOffsets: indexSet)
+//                        }
+//                    }
                 }
                 
                 Section {
                     HStack(spacing: 12) {
                         Button {
                             exercises.append(DraftWorkoutExercise())
+							HapticManager.selection()
                         } label: {
                             Text("Add Exercise")
                                 .font(.headline)
@@ -211,7 +230,7 @@ struct CreateWorkoutView: View {
         }
 
         guard !validExercises.isEmpty else {
-            errorMessage = "Add at least one exercise."
+            errorMessage = "Add at least one exercise with name."
             showingError = true
             return
         }
@@ -237,7 +256,10 @@ struct CreateWorkoutView: View {
 
         do {
             try viewContext.save()
+			HapticManager.success()
             dismiss()
+			exercises = [DraftWorkoutExercise()]
+			title = ""
         } catch {
             errorMessage = error.localizedDescription
             showingError = true

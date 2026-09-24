@@ -66,6 +66,9 @@ struct LogWorkoutView: View {
                                     .tag(template.objectID as NSManagedObjectID?)
                             }
                         }
+						.onChange(of: selectedTemplate) { oldValue, newValue in
+							HapticManager.success()
+						}
                     }
                 }
                 .colorMultiply(Colormanager.Typography.primaryText)
@@ -200,6 +203,7 @@ struct LogWorkoutView: View {
 
         do {
             try viewContext.save()
+			HapticManager.success()
             dismiss()
         } catch {
             errorMessage = error.localizedDescription

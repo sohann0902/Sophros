@@ -41,3 +41,37 @@ enum HapticManager {
 			.selectionChanged()
 	}
 }
+
+struct HapticsTestView: View {
+	var body: some View {
+		VStack {
+			Button("error") {
+				HapticManager.error()
+			}
+			
+			Button("heavy") {
+				HapticManager.heavy()
+			}
+			
+			Button("light") {
+				HapticManager.light()
+			}
+			
+			Button("medium") {
+				HapticManager.medium()
+			}
+			
+			Button("selection") {
+				HapticManager.selection()
+			}
+			
+			Button("success") {
+				HapticManager.success()
+			}
+			
+			Button("warning") {
+				HapticManager.warning()
+			}
+		}
+	}
+}

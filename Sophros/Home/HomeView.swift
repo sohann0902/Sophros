@@ -25,7 +25,7 @@ struct HomeView : View {
             GeometryReader { geometry in
 
                 ZStack(alignment: .topLeading) {
-                    Colormanager.baseBackground
+					Color.surface
                         .ignoresSafeArea()
 
                     //titleView
@@ -44,6 +44,7 @@ struct HomeView : View {
                         
                         // dashboard
                         CardsView()
+							.ignoresSafeArea(edges: .bottom)
                         
                     }
                 }

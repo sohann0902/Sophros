@@ -17,7 +17,7 @@ enum CyclePhase: String, CaseIterable, Identifiable {
         switch self {
         case .period: "Menstrual Phase"
         case .follicular: "Follicular Phase"
-        case .ovulation: "Ovulation"
+        case .ovulation: "Ovulation Phase"
         case .luteal: "Luteal Phase"
         }
     }

@@ -16,16 +16,6 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-
-//            NotesView()
-//                .tabItem {
-//                    Label("Notes", systemImage: "book.pages")
-//                }
-//
-//            CalendarView()
-//                .tabItem {
-//                    Label("Calendar", systemImage: "calendar")
-//                }
             
             SettingsView()
                 .tabItem {
