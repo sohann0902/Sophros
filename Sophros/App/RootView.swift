@@ -13,7 +13,7 @@ import CoreData
 /// is saved and the flag is set.
 struct RootView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @State private var showSplash = true
+    @State private var showSplash = false
     @State private var isLaunchContentVisible = false
 
     var body: some View {

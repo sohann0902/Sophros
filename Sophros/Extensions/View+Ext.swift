@@ -16,4 +16,15 @@ extension View {
 			for: nil
 		)
 	}
+	
+	func fontStyle(_ style: AppFont, size: CGFloat? = nil) -> some View {
+		self
+			.font(
+				.custom(
+					style.fontName,
+					size: size ?? style.fontSize
+				)
+			)
+			.foregroundStyle(style.color)
+	}
 }

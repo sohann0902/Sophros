@@ -26,8 +26,7 @@ struct Splashscreen : View {
 				
 				Text("One app. Every part of you.")
 					.foregroundStyle(Colormanager.Surfaces.logoColor)
-					.font(.system(.footnote, weight: .light))
-					.italic()
+					.fontStyle(.italic)
 					.mask(
 						GeometryReader { geometry in
 							Rectangle()

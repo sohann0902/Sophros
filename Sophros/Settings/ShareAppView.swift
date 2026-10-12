@@ -14,8 +14,7 @@ struct ShareAppView: View {
 			
 			VStack(alignment: .leading) {
 				Text("Share Feedback")
-					.font(.largeTitle)
-					.fontWeight(.heavy)
+					.fontStyle(.largeTitle)
 					.padding()
 				
 				Text("""
@@ -26,16 +25,19 @@ struct ShareAppView: View {
 				.padding()
 				
 				Text("Send Feedback")
+					.fontStyle(.subheadline)
 					.padding(.horizontal)
 				
 				Link(destination: URL(string: "mailto:support.sophros.app@gmail.com")!) {
 					Text("support.sophros.app@gmail.com")
 				}
+				.fontStyle(.subheadline)
 				.tint(Colormanager.Water.deepBlue)
 				.padding(.horizontal)
 				
 				Spacer()
 			}
+			.fontStyle(.body)
 			.frame(maxWidth: .infinity)
 			.multilineTextAlignment(.leading)
 		}

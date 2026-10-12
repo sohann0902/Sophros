@@ -139,6 +139,7 @@ struct NutritionSettings: View {
 					}
 				}
 			}
+			.fontStyle(.body)
 			.scrollContentBackground(.hidden)
 			.sheet(isPresented: $isediting) {
 				NumericGoalSheet(title: nutritionGoalHeader.getTitle(), value: $value) { newValue in

@@ -46,12 +46,13 @@ struct AboutAppView: View {
 
 					Thanks for being part of the journey.
 					""")
+				.fontStyle(.body)
 				
 				Text("Sophros")
-					.font(.headline)
+					.fontStyle(.headline)
 				
 				Text("Build healthy balance, one day at a time.")
-					.italic()
+					.fontStyle(.italic)
 					.padding(.top, -16)
 				
 			}
@@ -59,6 +60,7 @@ struct AboutAppView: View {
 			.padding()
 			.multilineTextAlignment(.leading)
 		}
+		.scrollIndicators(.hidden)
 	}
 }
 

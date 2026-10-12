@@ -5,11 +5,6 @@
 //  Created by Sohan Maurya on 17/09/26.
 //
 
-
-//
-//  KeyboardInputSheet.swift
-
-
 import SwiftUI
 import UIKit
 
@@ -29,8 +24,8 @@ struct ConfirmAccessoryBar: View {
 	var body: some View {
 		Button(action: action) {
 			Text(title)
-				.font(.headline.weight(.semibold))
 				.foregroundStyle(.white)
+				.fontStyle(.title)
 				.frame(maxWidth: .infinity)
 				.padding(.vertical, 18)
 		}
@@ -58,10 +53,7 @@ final class KeyboardTextFieldController: UIViewController, UITextFieldDelegate {
 
 	var accessoryTitle = "Confirm"
 	var keyboardType: UIKeyboardType = .decimalPad
-	var font: UIFont = .systemFont(
-		ofSize: 64,
-		weight: .semibold
-	)
+	var font: UIFont = UIFont(name: "Nunito-Black", size: 64) ?? .systemFont(ofSize: 64)
 
 	var textAlignment: NSTextAlignment = .center
 
@@ -235,10 +227,7 @@ struct KeyboardTextField: UIViewControllerRepresentable {
 
 	var accessoryTitle: String = "Confirm"
 
-	var font: UIFont = .systemFont(
-		ofSize: 64,
-		weight: .semibold
-	)
+	var font: UIFont = UIFont(name: "Nunito-Black", size: 64) ?? .systemFont(ofSize: 64)
 
 	var onConfirm: (String) -> Void
 
@@ -291,119 +280,6 @@ struct KeyboardTextField: UIViewControllerRepresentable {
 
 		if controller.textField.text != text {
 			controller.textField.text = text
-		}
-	}
-}
-
-
-// MARK: - Numeric Goal Sheet
-
-struct NumericGoalSheet: View {
-
-	let title: String
-
-	@Binding var value: String
-
-	var keyboardType: UIKeyboardType = .decimalPad
-
-	var onConfirm: (String) -> Void
-
-	@Environment(\.dismiss)
-	private var dismiss
-
-
-	var body: some View {
-
-		VStack(spacing: 12) {
-			
-			Color.clear
-				.frame(height: 30)
-
-			Text(title)
-				.font(.title2.bold())
-				.padding(.top, 16)
-
-
-			KeyboardTextField(
-				text: $value,
-				keyboardType: keyboardType,
-				onConfirm: { currentText in
-
-					// currentText is the actual
-					// current UITextField value.
-					onConfirm(currentText)
-
-					dismiss()
-				},
-				onKeyboardDismiss: {
-
-					dismiss()
-				}
-			)
-			.frame(height: 80)
-		}
-
-//		.ignoresSafeArea(
-//			.keyboard
-//		)
-
-		.presentationDetents([
-			.height(160)
-		])
-	}
-}
-
-
-// MARK: - Example
-
-private struct ExampleView: View {
-
-	@State private var showSheet = false
-
-	@State private var calorieGoal = 2000.0
-
-	var body: some View {
-
-		Button(
-			"Set calorie goal: \(Int(calorieGoal))"
-		) {
-			showSheet = true
-		}
-
-		.sheet(
-			isPresented: $showSheet
-		) {
-
-			NumericGoalSheet(
-				title: "Calorie goal",
-
-				value: Binding(
-					get: {
-						String(
-							format: "%.0f",
-							calorieGoal
-						)
-					},
-
-					set: { newValue in
-						if let number = Double(newValue) {
-							calorieGoal = number
-						}
-					}
-				),
-
-				keyboardType: .decimalPad,
-
-				onConfirm: { newValue in
-
-					print(
-						"Confirmed calorie goal:",
-						newValue
-					)
-
-					// Save your Core Data value here.
-				}
-			)
 		}
 	}
 }

@@ -92,13 +92,17 @@ struct SettingsView: View {
 					
 					Section {
 						
+						NavigationLink {
+							
+						} label: {
+							SettingsRow(
+								icon: "square.and.arrow.up",
+								iconColor: Colormanager.Water.deepBlue,
+								title: "Share App",
+								value: "Share it with friends and family"
+							)
+						}
 						
-						SettingsRow(
-							icon: "square.and.arrow.up",
-							iconColor: Colormanager.Water.deepBlue,
-							title: "Share App",
-							value: "Share it with friends and family"
-						)
 					}
 					
 #if DEBUG
@@ -154,20 +158,19 @@ struct SettingsView: View {
 	private var profileCard: some View {
 		HStack(spacing: 16) {
 			Text(profileInitials)
-				.font(.title2.weight(.bold))
 				.foregroundStyle(.white)
+				.fontStyle(.largeTitle)
 				.frame(width: 58, height: 58)
 				.background(Colormanager.Accent.selected)
 				.clipShape(Circle())
 			
 			VStack(alignment: .leading, spacing: 4) {
 				Text(profileDisplayName)
-					.font(.title3.weight(.bold))
-					.foregroundStyle(Colormanager.Typography.primaryText)
+					.fontStyle(.title)
 				
 				Text(profileDetails)
-					.font(.subheadline)
-					.foregroundStyle(Colormanager.Typography.secondaryText)
+					.fontStyle(.body)
+
 			}
 			
 			Spacer(minLength: 0)
@@ -197,20 +200,18 @@ struct SettingsView: View {
 	private var nutritionCard: some View {
 		HStack(spacing: 14) {
 			Image(systemName: "fork.knife")
-				.font(.headline)
 				.foregroundStyle(Colormanager.Diet.apricot)
+				.fontStyle(.headline)
 				.frame(width: 34, height: 34)
 				.background(Colormanager.Diet.apricot.opacity(0.12))
 				.clipShape(Circle())
 			
 			VStack(alignment: .leading, spacing: 3) {
 				Text("Daily targets")
-					.font(.body.weight(.semibold))
-					.foregroundStyle(Colormanager.Typography.primaryText)
+					.fontStyle(.headline)
 				Text("\(Int(nutritionGoal?.calorie.rounded() ?? 0)) kcal per day")
-					.font(.caption)
-					.foregroundStyle(Colormanager.Typography.secondaryText)
-					.lineLimit(1)
+					.fontStyle(.footer)
+					.lineLimit(2)
 			}
 			
 			Spacer(minLength: 0)
@@ -258,20 +259,19 @@ private struct SettingsRow: View {
 	var body: some View {
 		HStack(spacing: 14) {
 			Image(systemName: icon)
-				.font(.headline)
 				.foregroundStyle(iconColor)
+				.fontStyle(.headline)
 				.frame(width: 34, height: 34)
 				.background(iconColor.opacity(0.12))
 				.clipShape(Circle())
 			
 			VStack(alignment: .leading, spacing: 3) {
 				Text(title)
-					.font(.body.weight(.semibold))
-					.foregroundStyle(Colormanager.Typography.primaryText)
+					.fontStyle(.headline)
+				
 				Text(value)
-					.font(.caption)
-					.foregroundStyle(Colormanager.Typography.secondaryText)
-					.lineLimit(1)
+					.fontStyle(.footer, size: 14)
+					.lineLimit(2)
 			}
 			
 			Spacer(minLength: 0)

@@ -12,19 +12,21 @@ import CoreData
 struct MainTabView: View {
     var body: some View {
         TabView {
-                HomeView()
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
-                }
+			HomeView()
+			.tabItem {
+				Label("Home", systemImage: "house.fill")
+			}
             
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
-        }
-        .tint(Colormanager.Accent.selected)
+			SettingsView()
+			.tabItem {
+				Label("Settings", systemImage: "gear")
+
+			}
+		}
+		.tint(.logo)
         .toolbarBackgroundVisibility(.hidden, for: .tabBar)
         .preferredColorScheme(.light)
+		.dynamicTypeSize(...DynamicTypeSize.xxLarge)
     }
 }
 

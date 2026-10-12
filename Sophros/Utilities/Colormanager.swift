@@ -65,7 +65,9 @@ struct Colormanager {
 
     struct Typography {
         static let primaryText: Color = Color("typographyPrimaryText")
+		static let primaryTextUIColor : UIColor = UIColor(named: "typographyPrimaryText")!
         static let secondaryText: Color = Color("typographySecondaryText")
+		static let secondaryTextUIColor: UIColor = UIColor(named: "typographySecondaryText")!
         static let tertiaryText: Color = Color("typographyTertiaryText")
         static let placeholder: Color = Color("typographyPlaceholder")
     }

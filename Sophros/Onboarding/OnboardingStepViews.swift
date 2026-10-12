@@ -28,22 +28,20 @@ struct WelcomeStepView: View {
 				FlowerBloom(shouldBloom: shouldAnimateFlower)
 				
 				Text("Welcome to Sophros")
-					.font(.system(size: 34, weight: .heavy))
+					.fontStyle(.largeTitle, size: 34)
 					.multilineTextAlignment(.center)
-					.foregroundStyle(Colormanager.Typography.primaryText)
 				
 				Text("Water, workouts, food, sleep, cycle, one place to keep track of it all.")
-					.font(.system(size: 16, weight: .medium))
+					.fontStyle(.body)
 					.multilineTextAlignment(.center)
-					.foregroundStyle(Colormanager.Typography.secondaryText)
 					.padding(.horizontal)
 						.padding(.bottom)
 				
 				
 				Button(action: onStart) {
 					Text("Get Started")
-						.font(.system(size: 18, weight: .bold))
 						.foregroundStyle(.white)
+						.fontStyle(.subheadline)
 						.frame(maxWidth: .infinity)
 						.padding(.vertical, 16)
 						.background(
@@ -68,8 +66,7 @@ struct NameStepView: View {
         TextField("Your name", text: $name)
             .textInputAutocapitalization(.words)
             .autocorrectionDisabled()
-            .font(.system(size: 22, weight: .semibold))
-            .foregroundStyle(Colormanager.Typography.primaryText)
+			.fontStyle(.title)
             .modifier(OnboardingFieldStyle())
             .focused($focused)
             .onAppear { focused = true }
@@ -90,10 +87,11 @@ struct GenderStepView: View {
                 } label: {
                     HStack {
                         Text(option.title)
-                            .font(.system(size: 18, weight: .semibold))
+                            
                         Spacer()
                     }
                     .foregroundStyle(isSelected ? .white : Colormanager.Typography.primaryText)
+					.fontStyle(.subheadline)
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(
@@ -127,11 +125,12 @@ struct AgeStepView: View {
         HStack(alignment: .firstTextBaseline) {
             TextField("25", text: text)
                 .keyboardType(.numberPad)
-                .font(.system(size: 40, weight: .heavy))
-                .foregroundStyle(Colormanager.Typography.primaryText)
+                .fontStyle(.largeTitle, size: 40)
+                
             Text("years")
-                .font(.system(size: 20, weight: .medium))
-                .foregroundStyle(Colormanager.Typography.secondaryText)
+				.foregroundStyle(Colormanager.Typography.secondaryText)
+				.fontStyle(.headline)
+               
         }
         .modifier(OnboardingFieldStyle())
         .focused($focused)
@@ -165,11 +164,12 @@ struct MeasurementStepView: View {
         HStack(alignment: .firstTextBaseline) {
             TextField(placeholder, text: text)
                 .keyboardType(.decimalPad)
-                .font(.system(size: 40, weight: .heavy))
-                .foregroundStyle(Colormanager.Typography.primaryText)
+				.fontStyle(.largeTitle, size: 40)
+
             Text(unit)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundStyle(Colormanager.Typography.secondaryText)
+				.foregroundStyle(Colormanager.Typography.secondaryText)
+                .fontStyle(.headline)
+               
         }
         .modifier(OnboardingFieldStyle())
         .focused($focused)
@@ -218,7 +218,8 @@ private struct SelectionRow: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                Text(title).font(.system(size: 18, weight: .semibold))
+                Text(title)
+				
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")
@@ -226,6 +227,7 @@ private struct SelectionRow: View {
                 }
             }
             .foregroundStyle(isSelected ? .white : Colormanager.Typography.primaryText)
+			.fontStyle(.subheadline)
             .padding()
             .frame(maxWidth: .infinity)
             .background(

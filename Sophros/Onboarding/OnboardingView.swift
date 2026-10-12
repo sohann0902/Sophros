@@ -46,13 +46,12 @@ struct OnboardingView: View {
             Spacer()
 
             Text("You're all set!")
-                .font(.system(size: 34, weight: .heavy))
-                .foregroundStyle(Colormanager.Typography.primaryText)
+				.fontStyle(.largeTitle, size: 34)
 
             Text("Let's keep everything in balance, starting today.")
-                .font(.system(size: 17, weight: .medium))
+				.foregroundStyle(Colormanager.Typography.secondaryText)
+                .fontStyle(.body)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(Colormanager.Typography.secondaryText)
                 .padding(.horizontal, 32)
 			
 			
@@ -90,12 +89,11 @@ struct OnboardingView: View {
 					VStack(alignment: .leading, spacing: 24) {
 						VStack(alignment: .leading, spacing: 8) {
 							Text(step.title)
-								.font(.system(size: 28, weight: .heavy))
-								.foregroundStyle(Colormanager.Typography.primaryText)
+								.fontStyle(.title)
 							
 							Text(step.subtitle)
-								.font(.system(size: 16, weight: .medium))
 								.foregroundStyle(Colormanager.Typography.secondaryText)
+								.fontStyle(.headline)
 						}
 						
 						stepContent
@@ -103,14 +101,14 @@ struct OnboardingView: View {
 					.padding(.horizontal)
 					.padding(.top, 24)
 				}
+				.scrollIndicators(.hidden)
 				
 			}
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button(action: goBack) {
 						Image(systemName: "chevron.left")
-							.font(.system(size: 18, weight: .bold))
-							.foregroundStyle(Colormanager.Typography.primaryText)
+							.fontStyle(.subheadline)
 					}
 				}
 				
@@ -166,8 +164,8 @@ struct OnboardingView: View {
     private var continueButton: some View {
         Button(action: advance) {
             Text(step.isLast ? "Finish" : "Continue")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(.white)
+				.foregroundStyle(.white)
+				.fontStyle(.subheadline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
@@ -245,5 +243,4 @@ struct OnboardingView: View {
 #Preview {
     OnboardingView(shouldAnimateWelcome: true)
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-	//
 }

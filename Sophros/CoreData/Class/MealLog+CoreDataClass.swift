@@ -52,6 +52,19 @@ enum MealType : String, CaseIterable, Hashable, Identifiable {
     var title: String {
         rawValue.capitalized
     }
+	
+	var image: String {
+		switch self {
+		case .breakfast:
+			return "breakfast-icon"
+		case .dinner:
+			return "dinner-icon"
+		case .lunch:
+			return "lunch-icon"
+		case .snack:
+			return "snack-icon"
+		}
+	}
 }
 
 enum MealKind : String {

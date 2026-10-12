@@ -67,23 +67,27 @@ struct DeleteConfirmationOverlay: View {
 
                     VStack(alignment: .leading, spacing: 16) {
 						
-						HStack {
+						HStack(alignment: .top) {
 							Image(systemName: "trash.fill")
-								.font(.title2.weight(.bold))
 								.foregroundStyle(request.tint)
+								.fontStyle(.title)
 								.padding()
 								.background(request.tint.opacity(0.14), in: Circle())
 							
-							Text(request.title)
-								.font(.title3.weight(.heavy))
-								.foregroundStyle(Colormanager.Typography.primaryText)
+							VStack(alignment: .leading) {
+								Text(request.title)
+									.fontStyle(.headline)
+									.multilineTextAlignment(.leading)
+								
+								Text(request.message)
+									.foregroundStyle(Colormanager.Typography.secondaryText)
+									.fontStyle(.body)
+									.multilineTextAlignment(.leading)
+									.frame(maxWidth: .infinity, alignment: .leading)
+							}
+							
+							
 						}
-
-                        Text(request.message)
-                            .font(.body)
-                            .foregroundStyle(Colormanager.Typography.secondaryText)
-							.multilineTextAlignment(.leading)
-							.frame(maxWidth: .infinity, alignment: .leading)
 
                         HStack(spacing: 12) {
 							Button {
@@ -91,8 +95,8 @@ struct DeleteConfirmationOverlay: View {
 								HapticManager.selection()
 							} label: {
 								Text("Cancel")
-									.font(.headline)
 									.foregroundStyle(.white)
+									.fontStyle(.headline)
 									.frame(maxWidth: .infinity)
 									.padding(.vertical, 14)
 									.contentShape(
@@ -109,8 +113,8 @@ struct DeleteConfirmationOverlay: View {
 								HapticManager.warning()
 							} label: {
 								Text("Delete")
-									.font(.headline)
 									.foregroundStyle(.white)
+									.fontStyle(.headline)
 									.frame(maxWidth: .infinity)
 									.padding(.vertical, 14)
 									.contentShape(

@@ -13,16 +13,17 @@ struct PrivacyView: View {
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
 					Text("Privacy")
-						.font(.largeTitle)
-						.fontWeight(.heavy)
+						.fontStyle(.largeTitle)
 						.padding(.bottom)
 					
 					
 					Text("Last updated: September 2026")
+						.fontStyle(.headline)
+					
 					Text("At Sophros, we believe your health and nutrition information should remain under your control. This Privacy Policy explains what information Sophros stores, how it is used, and the choices you have.")
 					
 					Text("Information You Provide")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("""
 						Sophros may store information you enter into the app, such as your profile details, nutrition goals, meals, saved meals, and other preferences you choose to provide.
@@ -32,7 +33,7 @@ struct PrivacyView: View {
 					
 					
 					Text("How Your Data Is Stored")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("""
 						Our app data is primarily stored locally on your device using Apple's local storage technologies.
@@ -41,7 +42,7 @@ struct PrivacyView: View {
 						""")
 					
 					Text("How We Use Your Information")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("""
 						Information stored within Sophros is used to operate the app and provide its features. For example, your age, height, weight, and other profile information may be used to calculate personalized nutrition goals.
@@ -52,7 +53,7 @@ struct PrivacyView: View {
 						""")
 					
 					Text("Sharing of Information")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("""
 						Sophros does not sell your personal information.
@@ -61,7 +62,7 @@ struct PrivacyView: View {
 						""")
 					
 					Text("Device Permissions")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("""
 						Sophros may request access to certain device features when a feature requires it. Permissions are requested through Apple's system controls, and you can change or revoke these permissions at any time through your device's Settings.
@@ -69,7 +70,7 @@ struct PrivacyView: View {
 						""")
 					
 					Text("Changes to This Privacy Policy")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("""
 						We may update this Privacy Policy when Sophros's features or data practices change. When we make changes, we will update the date shown at the top of this page.
@@ -79,15 +80,20 @@ struct PrivacyView: View {
 					
 					
 					Text("Contact Us")
-						.font(.headline)
+						.fontStyle(.headline)
 					
 					Text("If you have questions, concerns, or requests regarding privacy or your data, you can contact us at")
 					
 					Text("support.sophros.app@gmail.com")
+						.fontStyle(.subheadline)
+					
 				}
+				.fontStyle(.body)
 				.multilineTextAlignment(.leading)
 				.padding()
+				.dynamicTypeSize(...DynamicTypeSize.xxLarge)
 			}
+			.scrollIndicators(.hidden)
 			.background(Colormanager.card)
 			.frame(maxWidth: .infinity, alignment: .leading)
 	}

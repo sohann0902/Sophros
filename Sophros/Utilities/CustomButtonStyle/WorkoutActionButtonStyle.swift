@@ -12,10 +12,10 @@ struct WorkoutActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(
-                isPrimary ? .white : Colormanager.Workout.terracotta
-            )
+			.foregroundStyle(
+				isPrimary ? .white : Colormanager.Workout.terracotta
+			)
+            .fontStyle(.headline)
             .padding(.vertical)
             .background(
                 isPrimary
