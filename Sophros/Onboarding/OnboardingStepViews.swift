@@ -64,7 +64,7 @@ struct NameStepView: View {
 
     var body: some View {
         TextField("Your name", text: $name)
-            .textInputAutocapitalization(.words)
+			.textInputAutocapitalization(.words)
             .autocorrectionDisabled()
 			.fontStyle(.title)
             .modifier(OnboardingFieldStyle())

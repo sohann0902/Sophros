@@ -108,18 +108,18 @@ struct OnboardingView: View {
 				ToolbarItem(placement: .topBarLeading) {
 					Button(action: goBack) {
 						Image(systemName: "chevron.left")
-							.fontStyle(.subheadline)
+							.font(.caption.weight(.bold))
 					}
 				}
 				
 				ToolbarItem(placement: .topBarTrailing) {
 					Button(action: advance) {
 						Image(systemName: "checkmark")
-							.resizable()
-							.renderingMode(.template)
-							.scaledToFit()
 							.foregroundStyle(.white)
+							.font(.caption.weight(.bold))
+							.scaledToFit()
 							.opacity(draft.isValid(for: step) ? 1 : 0.4)
+							
 					}
 					.disabled(!draft.isValid(for: step))
 					.buttonStyle(.glassProminent)
