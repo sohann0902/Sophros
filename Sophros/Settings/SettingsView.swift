@@ -90,20 +90,20 @@ struct SettingsView: View {
 						
 					}
 					
-					Section {
-						
-						NavigationLink {
-							
-						} label: {
-							SettingsRow(
-								icon: "square.and.arrow.up",
-								iconColor: Colormanager.Water.deepBlue,
-								title: "Share App",
-								value: "Share it with friends and family"
-							)
-						}
-						
-					}
+//					Section {
+//						
+//						NavigationLink{
+//							
+//						} label: {
+//							SettingsRow(
+//								icon: "square.and.arrow.up",
+//								iconColor: Colormanager.Water.deepBlue,
+//								title: "Share App",
+//								value: "Share it with friends and family"
+//							)
+//						}
+//						
+//					}
 					
 #if DEBUG
 					Section {
