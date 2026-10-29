@@ -5,6 +5,7 @@
 
 import SwiftUI
 import CoreData
+import StoreKit
 
 
 #Preview {
@@ -16,6 +17,7 @@ import CoreData
 struct SettingsView: View {
 	@Environment(\.managedObjectContext) private var context
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+	@AppStorage("hasTappedRating") private var hasTappedRating = false
 	
 	@FetchRequest(
 		sortDescriptors: [NSSortDescriptor(keyPath: \UserProfile.createdAt, ascending: true)],
@@ -31,6 +33,10 @@ struct SettingsView: View {
 	
 	private var profile: UserProfile? { profiles.first }
 	private var nutritionGoal: NutritionGoal? { nutritionGoals.first }
+	
+	let appStoreURL = URL(string: "https://apps.apple.com/in/app/sophros-the-life-app/id6806810355")!
+	
+	@Environment(\.requestReview) var requestReview
 	
 	var body: some View {
 		NavigationStack {
@@ -56,7 +62,7 @@ struct SettingsView: View {
 					Section {
 						
 						NavigationLink{
-							ShareAppView()
+							ShareFeedbackView()
 						} label: {
 							SettingsRow(
 								icon: "ellipsis.bubble.fill",
@@ -90,20 +96,31 @@ struct SettingsView: View {
 						
 					}
 					
-//					Section {
-//						
-//						NavigationLink{
-//							
-//						} label: {
-//							SettingsRow(
-//								icon: "square.and.arrow.up",
-//								iconColor: Colormanager.Water.deepBlue,
-//								title: "Share App",
-//								value: "Share it with friends and family"
-//							)
-//						}
-//						
-//					}
+					Section {
+						ShareLink(item: appStoreURL) {
+							SettingsRow(
+								icon: "square.and.arrow.up",
+								iconColor: Colormanager.Water.deepBlue,
+								title: "Share App",
+								value: "Share it with friends and family"
+							)
+						}
+						
+						if hasTappedRating {
+							Button {
+								hasTappedRating = true
+								requestReview()
+							} label: {
+								SettingsRow(
+									icon: "star.fill",
+									iconColor: Color.notesWarmYellow,
+									title: "Rate the App",
+									value: "If you are enjoying the app please write a review"
+								)
+							}
+						}
+					}
+					
 					
 #if DEBUG
 					Section {

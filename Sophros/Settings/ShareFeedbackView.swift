@@ -1,5 +1,5 @@
 //
-//  ShareAppView.swift
+//  ShareFeedbackView.swift
 //  Sophros
 //
 //  Created by Sohan Maurya on 17/09/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ShareAppView: View {
+struct ShareFeedbackView: View {
 	var body: some View {
 		ZStack {
 			Colormanager.card
@@ -46,5 +46,5 @@ struct ShareAppView: View {
 
 
 #Preview {
-	ShareAppView()
+	ShareFeedbackView()
 }
